@@ -43,6 +43,12 @@
     <ClCompile Include="Utils\FrameTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\Sound.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Text.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Components\Camera.h">
@@ -70,6 +76,12 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Utils\FrameTimer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Sound.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Text.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

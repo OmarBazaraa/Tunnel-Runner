@@ -162,6 +162,8 @@
     <ClCompile Include="Game\GameEngine.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Utils\FrameTimer.cpp" />
+    <ClCompile Include="Utils\Sound.cpp" />
+    <ClCompile Include="Utils\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Components\Camera.h" />
@@ -173,6 +175,8 @@
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\GameEngine.h" />
     <ClInclude Include="Utils\FrameTimer.h" />
+    <ClInclude Include="Utils\Sound.h" />
+    <ClInclude Include="Utils\Text.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\lighting_fragment.shader" />
