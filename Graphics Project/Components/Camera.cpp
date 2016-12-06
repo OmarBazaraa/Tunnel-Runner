@@ -11,9 +11,23 @@ Camera::Camera(glm::vec3 position, double aspect) {
 	this->mHorAngle = YAW;
 	this->mVerAngle = PITCH;
 
-	// Camera options
-	this->mMovementSpeed = SPEED;
+	// Animation variables
+	// Move
+	this->mIsMovingStep = false;
+	this->mMoveSpeed = MOVE_SPEED;
+	this->mMoveDirection = 0.0f;
+	this->mMoveOffset = 0.0f;
+	this->mMoveDestination = 0.0f;
+	// Jump
+	this->mIsJumping = false;
+	this->mJumpVelocity = JUMP_SPEED;
+	this->mJumpAcceleration = JUMP_ACCELERATION;
+	this->mJumpOffset = 0.0f;
+	this->mJumpDestination = 0.0f;
+	// Look around
 	this->mMouseSensitivity = MOUSE_SENSITIVTY;
+
+	// Camera options
 	this->mFOV = MAX_FOV;
 	this->mAspectRatio = aspect;
 	this->mNearPlane = NEAR_PLANE;
@@ -24,6 +38,7 @@ Camera::Camera(glm::vec3 position, double aspect) {
 	this->mCursorLastY = 0;
 	this->mFirstFrame = true;
 
+	// Calculate camera vectors
 	this->UpdateCameraVectors();
 }
 
@@ -59,9 +74,74 @@ void Camera::ApplyEffects(const Shader& shader) {
 	glUniform3f(shader.CameraPositionLoc, this->mPosition.x, this->mPosition.y, this->mPosition.z);
 }
 
+/* Starts a specified camera animation */
+void Camera::StartAnimation(CameraAnimationType type, double offset) {
+	switch (type)
+	{
+	case MOVE_LEFT:
+		if (!this->mIsMovingStep) {
+			this->mIsMovingStep = true;
+			this->mMoveDirection = -1.0;
+			this->mMoveOffset = offset;
+			this->mMoveDestination = this->mPosition.x - offset;
+		}
+		break;
+	case MOVE_RIGHT:
+		if (!this->mIsMovingStep) {
+			this->mIsMovingStep = true;
+			this->mMoveDirection = 1.0;
+			this->mMoveOffset = offset;
+			this->mMoveDestination = this->mPosition.x + offset;
+		}
+		break;
+	case JUMP:
+		if (!this->mIsJumping) {
+			this->mIsJumping = true;
+			this->mJumpVelocity = JUMP_SPEED;
+			this->mJumpOffset = offset;
+			this->mJumpDestination = this->mPosition.y;
+		}
+		break;
+	default:
+
+		break;
+	}
+}
+
+/* Updates the camera to apply the animation effects */
+void Camera::Update(double deltaTime) {
+	// Move effect
+	if (this->mIsMovingStep) {
+		float velocity =  this->mMoveSpeed * deltaTime;
+
+		this->mPosition.x += velocity * this->mMoveDirection;
+		this->mMoveOffset -= velocity;
+
+		if (this->mMoveOffset <= 0.0f) {
+			this->mPosition.x = this->mMoveDestination;
+			this->mIsMovingStep = false;
+		}
+	}
+
+	// Jump effect
+	if (this->mIsJumping) {
+		float velocity = this->mJumpVelocity * deltaTime;
+
+		this->mJumpVelocity -= this->mJumpAcceleration;
+
+		this->mPosition.y += velocity;
+		this->mJumpOffset -= velocity;
+
+		if (this->mPosition.y <= this->mJumpDestination) {
+			this->mPosition.y = this->mJumpDestination;
+			this->mIsJumping = false;
+		}
+	}
+}
+
 /* Moves the camera in a certain direction */
 void Camera::Move(CameraDirection direction, double deltaTime) {
-	float velocity = this->mMovementSpeed * deltaTime;
+	float velocity = this->mMoveSpeed * deltaTime;
 
 	if (direction == FORWARD)
 		this->mPosition += this->mFront * velocity;

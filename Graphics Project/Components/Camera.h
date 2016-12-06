@@ -21,19 +21,35 @@ enum CameraDirection {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
 };
+
+/*
+	Defines several camera animation effects
+*/
+enum CameraAnimationType {
+	IDEAL,
+	MOVE_LEFT,
+	MOVE_RIGHT,
+	JUMP
+};
+
 
 // Default camera values
 const glm::vec3 POSITION(0.0f, 0.0f, 0.0f);
 const glm::vec3 FRONT(0.0f, 0.0f, -1.0f);
 const glm::vec3 WORLD_UP(0.0f, 1.0f, 0.0f);
+// Eular angles
 const double YAW = -90.0f;
 const double PITCH = 0.0f;
 const double MAX_PITCH = 89.0f;
 const double MIN_PITCH = -89.0f;
-const double SPEED = 5.0f;
+// Animation constants
+const double MOVE_SPEED = 5.0f;
+const double JUMP_SPEED = 10.0f;
+const double JUMP_ACCELERATION = 0.5f;
 const double MOUSE_SENSITIVTY = 5.0f;
+// Camera options
 const double MAX_FOV = 45.0f;
 const double MIN_FOV = 1.0f;
 const double ASPECT_RATIO = 1.3333f;
@@ -47,22 +63,39 @@ const double FAR_PLANE = 100.0f;
 class Camera
 {
 private:
-	// Camera Attributes
+	// Camera attributes
 	glm::vec3 mPosition;
 	glm::vec3 mFront;
 	glm::vec3 mUp;
 	glm::vec3 mRight;
 	glm::vec3 mWorldUp;
-	// Eular Angles
+
+	// Eular angles
 	double mHorAngle;	// Rotation angle around y-axis
 	double mVerAngle;	// Rotation angle around x-axis
-	// Camera options
-	double mMovementSpeed;
+
+	// Animation variables
+	// Move
+	bool mIsMovingStep;
+	double mMoveSpeed;
+	double mMoveDirection;
+	double mMoveOffset;
+	double mMoveDestination;
+	// Jump
+	bool mIsJumping;
+	double mJumpVelocity;
+	double mJumpAcceleration;
+	double mJumpOffset;
+	double mJumpDestination;
+	// Look around
 	double mMouseSensitivity;
+
+	// Camera options
 	double mFOV;
 	double mAspectRatio;
 	double mNearPlane;
 	double mFarPlane;
+
 	// Cursor variables
 	double mCursorLastX;
 	double mCursorLastY;
@@ -89,6 +122,12 @@ public:
 
 	/* Applies camera view by sending the related matrices to the shader */
 	void ApplyEffects(const Shader& shader);
+
+	/* Starts a specified camera animation */
+	void StartAnimation(CameraAnimationType type, double offset);
+
+	/* Updates the camera to apply the animation effects */
+	void Update(double deltaTime);
 
 	/* Moves the camera in a certain direction */
 	void Move(CameraDirection direction, double deltaTime);

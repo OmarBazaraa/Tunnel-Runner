@@ -15,8 +15,21 @@
 // Forward class declaration
 class GameEngine;
 
-// Constants
-const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 0.5f, 0.0f);
+// Scene constants
+const int HORIZONTAL_LANES_COUNT = 5;
+const double LANE_SIZE = 1.0f;
+const double SCENE_WIDTH = HORIZONTAL_LANES_COUNT * LANE_SIZE;
+const double SCENE_HEIGHT = 4.0f;
+const double SCENE_DEPTH = 40.0f;
+const double CUBE_SIZE = LANE_SIZE;
+const double SPHERE_RADIUS = 0.3f;
+const double COIN_SIZE = 0.2;
+const double RING_RADIUS = 1.0;
+const double RING_DEPTH = 0.2;
+
+// Camera constants
+const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
+const double JUMP_OFFSET = 1.5f;
 
 
 /*
@@ -40,7 +53,7 @@ private:
 
 	// Models info
 	glm::mat4 mCoinsModelMatrices[10];
-	glm::mat4 mCubesModelMatrices[2];
+	glm::mat4 mCubesModelMatrices[3];
 	glm::mat4 mRingsModelMatrices[2];
 
 	// Light sources

@@ -38,6 +38,9 @@ void Game::ProcessInput() {
 
 /* Updates objects' information needed to apply effects on the next frame  */
 void Game::Update() {
+	// Update camera
+	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
+
 	// Update light sources
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
@@ -48,14 +51,14 @@ void Game::Update() {
 
 	// Coins
 	for (unsigned int i = 0; i < 5; ++i) {
-		mCoinsModelMatrices[i] = glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.0f, i * -1.0f - 2.0f));
-		mCoinsModelMatrices[i] = glm::scale(mCoinsModelMatrices[i], glm::vec3(0.2f, 0.2f, 0.2f));
+		mCoinsModelMatrices[i] = glm::translate(glm::mat4(1.0f), glm::vec3(-LANE_SIZE, COIN_SIZE, i * -LANE_SIZE - LANE_SIZE * 2));
+		mCoinsModelMatrices[i] = glm::scale(mCoinsModelMatrices[i], glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 		mCoinsModelMatrices[i] = glm::rotate(mCoinsModelMatrices[i], (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	for (unsigned int i = 5; i < 10; ++i) {
-		mCoinsModelMatrices[i] = glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, i * -1.0f - 5.0f));
-		mCoinsModelMatrices[i] = glm::scale(mCoinsModelMatrices[i], glm::vec3(0.2f, 0.2f, 0.2f));
+		mCoinsModelMatrices[i] = glm::translate(glm::mat4(1.0f), glm::vec3(LANE_SIZE, COIN_SIZE, i * -LANE_SIZE - LANE_SIZE * 5));
+		mCoinsModelMatrices[i] = glm::scale(mCoinsModelMatrices[i], glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 		mCoinsModelMatrices[i] = glm::rotate(mCoinsModelMatrices[i], (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	// ---------------------------
@@ -75,7 +78,7 @@ void Game::Render() {
 		this->mCoin->Draw(*this->mShader);
 	}
 
-	for (unsigned int i = 0; i < 2; ++i) {
+	for (unsigned int i = 0; i < 3; ++i) {
 		this->mCube->ModelMatrix = this->mCubesModelMatrices[i];
 		this->mCube->Draw(*this->mShader);
 	}
@@ -91,14 +94,21 @@ void Game::ProcessKeyInput() {
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(this->mEngine->mWind, GL_TRUE);
 
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_W) == GLFW_PRESS)
+	/*if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_W) == GLFW_PRESS)
 		this->mCamera->Move(FORWARD, this->mEngine->mTimer->ElapsedFramesTime);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_S) == GLFW_PRESS)
 		this->mCamera->Move(BACKWARD, this->mEngine->mTimer->ElapsedFramesTime);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
 		this->mCamera->Move(RIGHT, this->mEngine->mTimer->ElapsedFramesTime);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
-		this->mCamera->Move(LEFT, this->mEngine->mTimer->ElapsedFramesTime);
+		this->mCamera->Move(LEFT, this->mEngine->mTimer->ElapsedFramesTime);*/
+
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
+		this->mCamera->StartAnimation(MOVE_LEFT, LANE_SIZE);
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
+		this->mCamera->StartAnimation(MOVE_RIGHT, LANE_SIZE);
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS)
+		this->mCamera->StartAnimation(JUMP, JUMP_OFFSET);
 }
 
 /* Processes inputs from mouse */
@@ -123,25 +133,28 @@ void Game::InitShaders() {
 /* Initializes the game models */
 void Game::InitModels() {
 	this->mScene = new Model("Models/scene/scene.obj");
-	this->mScene->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.5f, -20.0f));
-	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(6.0f, 4.0f, 40.0f));
+	this->mScene->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, -0.5 * SCENE_DEPTH));
+	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
 	this->mSphere = new Model("Models/sphere/sphere.obj");
-	this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0f, -5.0f));
-	this->mSphere->ModelMatrix = glm::scale(this->mSphere->ModelMatrix, glm::vec3(0.5f, 0.5f, 0.5f));
+	this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, SPHERE_RADIUS, -5 * LANE_SIZE));
+	this->mSphere->ModelMatrix = glm::scale(this->mSphere->ModelMatrix, glm::vec3(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS));
 
 	this->mCoin = new Model("Models/coin/coin.obj");
 
 	this->mCube = new Model("Models/cube/cube.obj");
-	this->mCubesModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2.5f, 0.0f, -5.0f));
-	this->mCubesModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, -10.0f));
-	this->mCubesModelMatrices[1] = glm::scale(mCubesModelMatrices[1], glm::vec3(2.0f, 1.0f, 1.0f));
+	this->mCubesModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2 * LANE_SIZE, 0.5 * CUBE_SIZE, -5 * LANE_SIZE));
+	this->mCubesModelMatrices[0] = glm::scale(this->mCubesModelMatrices[0], glm::vec3(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE));
+	this->mCubesModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-1 * LANE_SIZE, 0.5 * CUBE_SIZE, -10 * LANE_SIZE));
+	this->mCubesModelMatrices[1] = glm::scale(this->mCubesModelMatrices[1], glm::vec3(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE));
+	this->mCubesModelMatrices[2] = glm::translate(glm::mat4(1.0f), glm::vec3(-2 * LANE_SIZE, 0.5 * CUBE_SIZE, -10 * LANE_SIZE));
+	this->mCubesModelMatrices[2] = glm::scale(this->mCubesModelMatrices[2], glm::vec3(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE));
 	
 	this->mRing = new Model("Models/ring/ring.obj");
-	this->mRingsModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, -10.0f));
-	this->mRingsModelMatrices[0] = glm::scale(mRingsModelMatrices[0], glm::vec3(1.2f, 1.2f, 0.5f));
-	this->mRingsModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 2.0f, -15.0f));
-	this->mRingsModelMatrices[1] = glm::scale(mRingsModelMatrices[1], glm::vec3(1.2f, 1.2f, 0.5f));
+	this->mRingsModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2 * LANE_SIZE, RING_RADIUS + LANE_SIZE, -10 * LANE_SIZE));
+	this->mRingsModelMatrices[0] = glm::scale(this->mRingsModelMatrices[0], glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
+	this->mRingsModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-2 * LANE_SIZE, RING_RADIUS + LANE_SIZE, -15 * LANE_SIZE));
+	this->mRingsModelMatrices[1] = glm::scale(this->mRingsModelMatrices[1], glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
 }
 
 /* Initializes the game light sources */
