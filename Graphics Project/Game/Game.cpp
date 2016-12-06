@@ -57,7 +57,7 @@ void Game::Update() {
 	}
 
 	for (unsigned int i = 5; i < 10; ++i) {
-		mCoinsModelMatrices[i] = glm::translate(glm::mat4(1.0f), glm::vec3(LANE_SIZE, COIN_SIZE, i * -LANE_SIZE - LANE_SIZE * 5));
+		mCoinsModelMatrices[i] = glm::translate(glm::mat4(1.0f), glm::vec3(LANE_SIZE, COIN_SIZE, i * -LANE_SIZE - LANE_SIZE * 4));
 		mCoinsModelMatrices[i] = glm::scale(mCoinsModelMatrices[i], glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 		mCoinsModelMatrices[i] = glm::rotate(mCoinsModelMatrices[i], (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
@@ -143,17 +143,17 @@ void Game::InitModels() {
 	this->mCoin = new Model("Models/coin/coin.obj");
 
 	this->mCube = new Model("Models/cube/cube.obj");
-	this->mCubesModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2 * LANE_SIZE, 0.5 * CUBE_SIZE, -5 * LANE_SIZE));
-	this->mCubesModelMatrices[0] = glm::scale(this->mCubesModelMatrices[0], glm::vec3(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE));
-	this->mCubesModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-1 * LANE_SIZE, 0.5 * CUBE_SIZE, -10 * LANE_SIZE));
-	this->mCubesModelMatrices[1] = glm::scale(this->mCubesModelMatrices[1], glm::vec3(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE));
-	this->mCubesModelMatrices[2] = glm::translate(glm::mat4(1.0f), glm::vec3(-2 * LANE_SIZE, 0.5 * CUBE_SIZE, -10 * LANE_SIZE));
-	this->mCubesModelMatrices[2] = glm::scale(this->mCubesModelMatrices[2], glm::vec3(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE));
+	this->mCubesModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2 * LANE_SIZE, 0.5 * CUBE_HEIGHT, -5 * LANE_SIZE));
+	this->mCubesModelMatrices[0] = glm::scale(this->mCubesModelMatrices[0], glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_SIZE));
+	this->mCubesModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-1 * LANE_SIZE, 0.5 * CUBE_HEIGHT, -9 * LANE_SIZE));
+	this->mCubesModelMatrices[1] = glm::scale(this->mCubesModelMatrices[1], glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_SIZE));
+	this->mCubesModelMatrices[2] = glm::translate(glm::mat4(1.0f), glm::vec3(-2 * LANE_SIZE, 0.5 * CUBE_HEIGHT, -9 * LANE_SIZE));
+	this->mCubesModelMatrices[2] = glm::scale(this->mCubesModelMatrices[2], glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_SIZE));
 	
 	this->mRing = new Model("Models/ring/ring.obj");
-	this->mRingsModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2 * LANE_SIZE, RING_RADIUS + LANE_SIZE, -10 * LANE_SIZE));
+	this->mRingsModelMatrices[0] = glm::translate(glm::mat4(1.0f), glm::vec3(2 * LANE_SIZE, RING_RADIUS + LANE_SIZE, -5 * LANE_SIZE));
 	this->mRingsModelMatrices[0] = glm::scale(this->mRingsModelMatrices[0], glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
-	this->mRingsModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-2 * LANE_SIZE, RING_RADIUS + LANE_SIZE, -15 * LANE_SIZE));
+	this->mRingsModelMatrices[1] = glm::translate(glm::mat4(1.0f), glm::vec3(-2 * LANE_SIZE, RING_RADIUS + LANE_SIZE, -9 * LANE_SIZE));
 	this->mRingsModelMatrices[1] = glm::scale(this->mRingsModelMatrices[1], glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
 }
 

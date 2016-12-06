@@ -17,12 +17,13 @@ class GameEngine;
 
 // Scene constants
 const int HORIZONTAL_LANES_COUNT = 5;
-const double LANE_SIZE = 1.0f;
+const double LANE_SIZE = 1.5f;
 const double SCENE_WIDTH = HORIZONTAL_LANES_COUNT * LANE_SIZE;
 const double SCENE_HEIGHT = 4.0f;
 const double SCENE_DEPTH = 40.0f;
 const double CUBE_SIZE = LANE_SIZE;
-const double SPHERE_RADIUS = 0.3f;
+const double CUBE_HEIGHT = 1.0;
+const double SPHERE_RADIUS = 0.5f;
 const double COIN_SIZE = 0.2;
 const double RING_RADIUS = 1.0;
 const double RING_DEPTH = 0.2;
