@@ -29,6 +29,8 @@ enum CameraDirection {
 */
 enum CameraAnimationType {
 	IDEAL,
+	MOVE_FORWARD,
+	MOVE_BACKWARD,
 	MOVE_LEFT,
 	MOVE_RIGHT,
 	JUMP
@@ -42,8 +44,10 @@ const glm::vec3 WORLD_UP(0.0f, 1.0f, 0.0f);
 // Eular angles
 const double YAW = -90.0f;
 const double PITCH = 0.0f;
-const double MAX_PITCH = 89.0f;
-const double MIN_PITCH = -89.0f;
+const double MAX_YAW = YAW + 45.0f;
+const double MIN_YAW = YAW - 45.0f;
+const double MAX_PITCH = 45.0f;
+const double MIN_PITCH = -MAX_PITCH;
 // Animation constants
 const double MOVE_SPEED = 5.0f;
 const double JUMP_SPEED = 10.0f;
@@ -76,11 +80,15 @@ private:
 
 	// Animation variables
 	// Move
-	bool mIsMovingStep;
+	bool mIsMovingHorizontalStep;
+	bool mIsMovingVerticalStep;
 	double mMoveSpeed;
-	double mMoveDirection;
-	double mMoveOffset;
-	double mMoveDestination;
+	double mMoveHorizontalDirection;
+	double mMoveVerticalDirection;
+	double mMoveHorizontalOffset;
+	double mMoveVerticalOffset;
+	double mMoveHorizontalDestination;
+	double mMoveVerticalDestination;
 	// Jump
 	bool mIsJumping;
 	double mJumpVelocity;
@@ -133,7 +141,7 @@ public:
 	void Move(CameraDirection direction, double deltaTime);
 
 	/* Changes camera direction by certain offset in X and Y */
-	void ChangeDirection(double xpos, double ypos, double deltaTime, bool constrainPitch = true);
+	void ChangeDirection(double xpos, double ypos, double deltaTime, bool constrainYaw = true, bool constrainPitch = true);
 
 	/* Changes the zoom effect of the camera by a certain offset */
 	void Zoom(double offset);

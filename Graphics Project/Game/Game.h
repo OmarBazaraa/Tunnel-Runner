@@ -1,5 +1,8 @@
 #pragma once
 
+// STL Includes
+#include <time.h>
+
 // GL Includes
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -12,15 +15,30 @@
 #include "../Components/Camera.h"
 #include "../Components/LightSource.h"
 
+
+/*
+	Defines several game items used in filling the game grid
+*/
+enum GameItem {
+	EMPTY,
+	BLOCK,
+	COIN,
+	SPHERE,
+	RING,
+	ITEMS_COUNT
+};
+
 // Forward class declaration
 class GameEngine;
 
 // Scene constants
-const int HORIZONTAL_LANES_COUNT = 5;
+const int LANES_X_COUNT = 5;
+const int LANES_Y_COUNT = 3;
+const int LANES_Z_COUNT = 20;
 const double LANE_SIZE = 1.5f;
-const double SCENE_WIDTH = HORIZONTAL_LANES_COUNT * LANE_SIZE;
-const double SCENE_HEIGHT = 4.0f;
-const double SCENE_DEPTH = 40.0f;
+const double SCENE_WIDTH = LANES_X_COUNT * LANE_SIZE;
+const double SCENE_HEIGHT = LANES_Y_COUNT * LANE_SIZE;
+const double SCENE_DEPTH = LANES_Z_COUNT * LANE_SIZE;
 const double CUBE_SIZE = LANE_SIZE;
 const double CUBE_HEIGHT = 1.0;
 const double SPHERE_RADIUS = 0.5f;
@@ -52,10 +70,8 @@ private:
 	Model* mCube;
 	Model* mRing;
 
-	// Models info
-	glm::mat4 mCoinsModelMatrices[10];
-	glm::mat4 mCubesModelMatrices[3];
-	glm::mat4 mRingsModelMatrices[2];
+	// Game grid
+	GameItem mGrid[LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
 
 	// Light sources
 	LightSource* mLight;
