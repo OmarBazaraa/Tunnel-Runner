@@ -187,7 +187,7 @@ void Camera::ChangeDirection(double xpos, double ypos, double deltaTime, bool co
 	}
 
 	double xoffset = (xpos - this->mCursorLastX) * deltaTime;
-	double yoffset = (this->mCursorLastY - ypos) * deltaTime;  // Reversed since y-coordinates go from bottom to left
+	double yoffset = (this->mCursorLastY - ypos) * deltaTime;  // Reversed since y-coordinates go from bottom to top
 	
 	this->mCursorLastX = xpos;
 	this->mCursorLastY = ypos;
@@ -223,6 +223,10 @@ void Camera::Zoom(double offset) {
 		this->mFOV = MIN_FOV;
 	if (this->mFOV >= MAX_FOV)
 		this->mFOV = MAX_FOV;
+}
+
+void Camera::SetMoveSpeed(double speed) {
+	this->mMoveSpeed = speed;
 }
 
 /* Calculates the front vector from the camera's (updated) Eular Angles */

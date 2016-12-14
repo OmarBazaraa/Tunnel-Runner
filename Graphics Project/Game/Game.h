@@ -35,6 +35,7 @@ class GameEngine;
 const int LANES_X_COUNT = 5;
 const int LANES_Y_COUNT = 3;
 const int LANES_Z_COUNT = 20;
+const int BLOCKS_COUNT = 5;
 const double LANE_SIZE = 1.5f;
 const double SCENE_WIDTH = LANES_X_COUNT * LANE_SIZE;
 const double SCENE_HEIGHT = LANES_Y_COUNT * LANE_SIZE;
@@ -48,6 +49,7 @@ const double RING_DEPTH = 0.2;
 
 // Camera constants
 const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
+const double CAMERA_ACCELERATION = 0.001;
 const double JUMP_OFFSET = 1.5f;
 
 
@@ -71,12 +73,14 @@ private:
 	Model* mRing;
 
 	// Game grid
-	GameItem mGrid[LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	GameItem mGrid[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	int mBlockId;
 
 	// Light sources
 	LightSource* mLight;
 
 	// Camera
+	double mCameraSpeed = 2;
 	Camera* mCamera;
 	
 
@@ -114,4 +118,9 @@ private:
 
 	/* Initializes the game light sources */
 	void InitLightSources();
+
+
+	/* Initialezies the game blocks */
+	void InitGameBlocks();
+
 };

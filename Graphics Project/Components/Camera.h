@@ -146,6 +146,9 @@ public:
 	/* Changes the zoom effect of the camera by a certain offset */
 	void Zoom(double offset);
 
+	/* Sets the Camera movement speed with a certain value */
+	void SetMoveSpeed(double speed);
+
 private:
 	/* Calculates the front vector from the camera's (updated) Eular Angles */
 	void UpdateCameraVectors();

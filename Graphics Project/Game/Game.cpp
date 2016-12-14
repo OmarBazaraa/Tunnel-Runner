@@ -9,6 +9,7 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitShaders();
 	InitModels();
 	InitLightSources();
+	InitGameBlocks();
 }
 
 /* Destructs the game and free resources */
@@ -56,12 +57,19 @@ void Game::Render() {
 	this->mCamera->ApplyEffects(*mShader);
 	this->mLight->ApplyEffects(*mShader);
 
+	// Move the scene with the camera to make it feel endless
+	glm::vec3 cameraPosition = this->mCamera->GetPosition();
+	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
+	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
+
+	//Draw the scene
 	this->mScene->Draw(*this->mShader);
 
+	//Draw the block
 	for (int z = 0; z < LANES_Z_COUNT; ++z) {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				switch (this->mGrid[z][y][x])
+				switch (this->mGrid[mBlockId][z][y][x])
 				{
 				case BLOCK:
 					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, 0.5f * CUBE_HEIGHT + y * LANE_SIZE, -z * LANE_SIZE));
@@ -104,12 +112,18 @@ void Game::ProcessKeyInput() {
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
 		this->mCamera->Move(RIGHT, this->mEngine->mTimer->ElapsedFramesTime);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
-		this->mCamera->Move(LEFT, this->mEngine->mTimer->ElapsedFramesTime);*/
+		this->mCamera->Move(LEFT, this->mEngine->mTimer->ElapsedFramesTime);
 
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_W) == GLFW_PRESS)
 		this->mCamera->StartAnimation(MOVE_FORWARD, LANE_SIZE);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_S) == GLFW_PRESS)
-		this->mCamera->StartAnimation(MOVE_BACKWARD, LANE_SIZE);
+		this->mCamera->StartAnimation(MOVE_BACKWARD, LANE_SIZE);*/
+
+	/* Moves the camera forward every frame by default */
+	this->mCamera->SetMoveSpeed(mCameraSpeed);
+	this->mCamera->StartAnimation(MOVE_FORWARD, LANE_SIZE);
+	mCameraSpeed += CAMERA_ACCELERATION;
+
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
 		this->mCamera->StartAnimation(MOVE_LEFT, LANE_SIZE);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
@@ -150,15 +164,9 @@ void Game::InitModels() {
 	this->mSphere = new Model("Models/sphere/sphere.obj");
 	this->mRing = new Model("Models/ring/ring.obj");
 
-	// Randomlly generate the game item grid
+	// Randomlly gets the game item block
 	srand(time(NULL));
-	for (int z = 0; z < LANES_Z_COUNT; ++z) {
-		for (int y = 0; y < LANES_Y_COUNT; ++y) {
-			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				this->mGrid[z][y][x] = (GameItem)(rand() % ITEMS_COUNT);
-			}
-		}
-	}
+	this->mBlockId = rand() % BLOCKS_COUNT;
 }
 
 /* Initializes the game light sources */
@@ -170,4 +178,17 @@ void Game::InitLightSources() {
 	this->mLight->AttenuationConstant = 0.5f;
 	this->mLight->AttenuationLinear = 0.1f;
 	this->mLight->AttenuationQuadratic = 0.032f;
+}
+
+/* Initialezies the game blocks */
+void Game::InitGameBlocks() {
+	for (int b = 0; b < BLOCKS_COUNT; b++) {
+		for (int z = 0; z < LANES_Z_COUNT; ++z) {
+			for (int y = 0; y < LANES_Y_COUNT; ++y) {
+				for (int x = 0; x < LANES_X_COUNT; ++x) {
+					mGrid[b][z][y][x] = (GameItem)(b);
+				}
+			}
+		}
+	}
 }
