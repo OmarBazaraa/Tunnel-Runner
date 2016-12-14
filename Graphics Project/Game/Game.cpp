@@ -156,10 +156,6 @@ void Game::InitModels() {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
 				this->mGrid[z][y][x] = (GameItem)(rand() % ITEMS_COUNT);
-
-				if (z <= 2) {
-					this->mGrid[z][y][x] = EMPTY;
-				}
 			}
 		}
 	}
