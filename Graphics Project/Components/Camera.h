@@ -149,6 +149,9 @@ public:
 	/* Sets the Camera movement speed with a certain value */
 	void SetMoveSpeed(double speed);
 
+	/* Sets the position of the camera by the given vector */
+	void SetPosition(glm::vec3 position = POSITION);
+
 private:
 	/* Calculates the front vector from the camera's (updated) Eular Angles */
 	void UpdateCameraVectors();

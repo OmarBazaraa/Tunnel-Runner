@@ -194,14 +194,14 @@ void Camera::ChangeDirection(double xpos, double ypos, double deltaTime, bool co
 
 	this->mHorAngle += xoffset * this->mMouseSensitivity;
 	this->mVerAngle += yoffset * this->mMouseSensitivity;
-
+	/*
 	// Make sure that yaw angle is within range
 	if (constrainYaw) {
 		if (this->mHorAngle > MAX_YAW)
 			this->mHorAngle = MAX_YAW;
 		if (this->mHorAngle < MIN_YAW)
 			this->mHorAngle = MIN_YAW;
-	}
+	}*/
 
 	// Make sure that when pitch angle is out of bounds, screen doesn't get flipped
 	if (constrainPitch) {
@@ -227,6 +227,10 @@ void Camera::Zoom(double offset) {
 
 void Camera::SetMoveSpeed(double speed) {
 	this->mMoveSpeed = speed;
+}
+
+void Camera::SetPosition(glm::vec3 position) {
+	this->mPosition = position;
 }
 
 /* Calculates the front vector from the camera's (updated) Eular Angles */

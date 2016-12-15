@@ -7,9 +7,9 @@ Game::Game(GameEngine* engine, const char* title) {
 
 	InitCamera();
 	InitShaders();
+	InitGameBlocks();
 	InitModels();
 	InitLightSources();
-	InitGameBlocks();
 }
 
 /* Destructs the game and free resources */
@@ -65,30 +65,37 @@ void Game::Render() {
 	//Draw the scene
 	this->mScene->Draw(*this->mShader);
 
+	// populate the game items (mGrid) to be rendered
+	GenerateSceneItems();
+
 	//Draw the block
-	for (int z = 0; z < LANES_Z_COUNT; ++z) {
-		for (int y = 0; y < LANES_Y_COUNT; ++y) {
-			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				switch (this->mGrid[mBlockId][z][y][x])
+	for (int y = 0; y < LANES_Y_COUNT; ++y) {
+		for (int x = 0; x < LANES_X_COUNT; ++x) {
+			for (int z = 0;z < this->mGrid[y][x].size(); ++z) {
+				GameItem cell = this->mGrid[y][x].front();
+				this->mGrid[y][x].pop();
+				this->mGrid[y][x].push(cell);
+
+				switch (cell)
 				{
 				case BLOCK:
-					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, 0.5f * CUBE_HEIGHT + y * LANE_SIZE, -z * LANE_SIZE));
+					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, 0.5f * CUBE_HEIGHT + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_SIZE));
 					this->mCube->Draw(*this->mShader);
 					break;
 				case COIN:
-					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, COIN_SIZE + y * LANE_SIZE, -z * LANE_SIZE));
+					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, COIN_SIZE + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mCoin->ModelMatrix = glm::scale(this->mCoin->ModelMatrix, glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
 					break;
 				case SPHERE:
-					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, SPHERE_RADIUS + y * LANE_SIZE, -z * LANE_SIZE));
+					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, SPHERE_RADIUS + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mSphere->ModelMatrix = glm::scale(this->mSphere->ModelMatrix, glm::vec3(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS));
 					this->mSphere->Draw(*this->mShader);
 					break;
 				case RING:
-					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, RING_RADIUS + y * LANE_SIZE, -z * LANE_SIZE));
+					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, RING_RADIUS + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mRing->ModelMatrix = glm::scale(this->mRing->ModelMatrix, glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
 					this->mRing->Draw(*this->mShader);
 					break;
@@ -122,7 +129,7 @@ void Game::ProcessKeyInput() {
 	/* Moves the camera forward every frame by default */
 	this->mCamera->SetMoveSpeed(mCameraSpeed);
 	this->mCamera->StartAnimation(MOVE_FORWARD, LANE_SIZE);
-	mCameraSpeed += CAMERA_ACCELERATION;
+	//mCameraSpeed += CAMERA_ACCELERATION;
 
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
 		this->mCamera->StartAnimation(MOVE_LEFT, LANE_SIZE);
@@ -164,9 +171,7 @@ void Game::InitModels() {
 	this->mSphere = new Model("Models/sphere/sphere.obj");
 	this->mRing = new Model("Models/ring/ring.obj");
 
-	// Randomlly gets the game item block
-	srand(time(NULL));
-	this->mBlockId = rand() % BLOCKS_COUNT;
+	this->GenerateSceneItems();
 }
 
 /* Initializes the game light sources */
@@ -186,9 +191,54 @@ void Game::InitGameBlocks() {
 		for (int z = 0; z < LANES_Z_COUNT; ++z) {
 			for (int y = 0; y < LANES_Y_COUNT; ++y) {
 				for (int x = 0; x < LANES_X_COUNT; ++x) {
-					mGrid[b][z][y][x] = (GameItem)(b);
+					mSceneBlocks[b][z][y][x] = (GameItem)(b);
 				}
 			}
 		}
 	}
+}
+
+
+/* Generates all of the scene items */
+void Game::GenerateSceneItems() {
+	//remove from the grid all of the hidden slices
+	ClearGrid();
+
+	while (mGrid[0][0].size() < LANES_Z_COUNT) {
+
+		// if the block is entirely put into the queue then we need to get a new one
+		if (mBlockSliceIdx == LANES_Z_COUNT) {
+			// Randomlly gets the game item block
+			this->mBlockId = rand() % (BLOCKS_COUNT - 2) + 2;
+
+			mBlockSliceIdx = 0;
+		}
+
+		// fills the queue with the slice items
+		for (int y = 0; y < LANES_Y_COUNT; ++y) {
+			for (int x = 0; x < LANES_X_COUNT; ++x) {
+				mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+			}
+		}
+		mBlockSliceIdx++;
+	}
+}
+
+
+
+/* Clears the grid queue from extra scenes that will not be drawn */
+void Game::ClearGrid() {
+	glm::vec3 cameraPosition = this->mCamera->GetPosition();
+	int newZIndexPos = abs(cameraPosition.z / LANE_SIZE);
+	if (newZIndexPos > mZGridIndex) {
+		mZGridIndex = newZIndexPos;
+		for (int y = 0; y < LANES_Y_COUNT; ++y) {
+			for (int x = 0; x < LANES_X_COUNT; ++x) {
+				mGrid[y][x].pop();
+			}
+		}
+		// moves the Z porition of the camera back to it's initial position
+		//this->mCamera->SetPosition(glm::vec3(cameraPosition.x, cameraPosition.y, CAMERA_POSITION.z));
+	}
+
 }

@@ -2,6 +2,7 @@
 
 // STL Includes
 #include <time.h>
+#include <queue>
 
 // GL Includes
 #include <glm/gtc/matrix_transform.hpp>
@@ -73,14 +74,16 @@ private:
 	Model* mRing;
 
 	// Game grid
-	GameItem mGrid[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	int mBlockId;
 
 	// Light sources
 	LightSource* mLight;
 
 	// Camera
-	double mCameraSpeed = 2;
+	double mCameraSpeed = 4;
+	int mZGridIndex = 0, mBlockSliceIdx = 0;
 	Camera* mCamera;
 	
 
@@ -123,4 +126,11 @@ private:
 	/* Initialezies the game blocks */
 	void InitGameBlocks();
 
+
+	/* Generates all of the scene items */
+	void GenerateSceneItems();
+
+
+	/* Clears the grid queue from extra scenes that will not be drawn */
+	void ClearGrid();
 };
