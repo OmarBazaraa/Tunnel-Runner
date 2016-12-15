@@ -43,11 +43,8 @@
     <ClCompile Include="Utils\FrameTimer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Sound.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\Text.cpp">
-      <Filter>Utils</Filter>
+    <ClCompile Include="Components\TextRenderer.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,11 +75,8 @@
     <ClInclude Include="Utils\FrameTimer.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Sound.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Text.h">
-      <Filter>Utils</Filter>
+    <ClInclude Include="Components\TextRenderer.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +84,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\lighting_vertex.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\text_fragment.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\text_vertex.shader">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

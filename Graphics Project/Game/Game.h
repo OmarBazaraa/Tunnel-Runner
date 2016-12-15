@@ -8,6 +8,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Sound Library Include
+#include <irrklang/irrKlang.h>
+using namespace irrklang;
+
 // Other includes
 #include "../Game/GameEngine.h"
 #include "../Components/Shader.h"
@@ -15,6 +19,7 @@
 #include "../Components/Model.h"
 #include "../Components/Camera.h"
 #include "../Components/LightSource.h"
+#include "../Components/TextRenderer.h"
 
 
 /*
@@ -63,8 +68,12 @@ private:
 	// Game engine
 	GameEngine* mEngine;
 
+	// Sound Engine
+	ISoundEngine* mSoundEngine;
+
 	// Shaders
 	Shader* mShader;
+	Shader* mTextShader;
 
 	// Models
 	Model* mScene;
@@ -81,12 +90,14 @@ private:
 	// Light sources
 	LightSource* mLight;
 
+	// Text renderers
+	TextRenderer* mTextRenderer;
+
 	// Camera
 	double mCameraSpeed = 4;
 	int mZGridIndex = 0, mBlockSliceIdx = 0;
 	Camera* mCamera;
 	
-
 public:
 	/* Constructs a new game with all related objects and components */
 	Game(GameEngine* engine, const char* title);
@@ -110,6 +121,9 @@ private:
 	/* Processes inputs from mouse */
 	void ProcessMouseInput();
 
+	/* Initializes the game sounds and background music */
+	void InitSounds();
+
 	/* Initializes the game camera */
 	void InitCamera();
 
@@ -122,10 +136,11 @@ private:
 	/* Initializes the game light sources */
 	void InitLightSources();
 
-
 	/* Initialezies the game blocks */
 	void InitGameBlocks();
 
+	/* Initializes the game text renderers */
+	void InitTextRenderers();
 
 	/* Generates all of the scene items */
 	void GenerateSceneItems();

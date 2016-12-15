@@ -5,11 +5,14 @@ Game::Game(GameEngine* engine, const char* title) {
 	this->mEngine = engine;
 	this->mEngine->RegisterGame(this, title);
 
+	InitSounds();
 	InitCamera();
 	InitShaders();
 	InitGameBlocks();
 	InitModels();
 	InitLightSources();
+	InitGameBlocks();
+	InitTextRenderers();
 }
 
 /* Destructs the game and free resources */
@@ -19,6 +22,7 @@ Game::~Game() {
 
 	// Destroy shaders
 	delete this->mShader;
+	delete this->mTextShader;
 
 	// Destroy models
 	delete this->mScene;
@@ -29,6 +33,9 @@ Game::~Game() {
 
 	// Destroy light sources
 	delete this->mLight;
+
+	// Destroy text renderers
+	delete this->mTextRenderer;
 }
 
 /* Receives user input and processes it for the next frame */
@@ -53,6 +60,9 @@ void Game::Update() {
 
 /* Renders the new frame */
 void Game::Render() {
+	//
+	// Draw Models
+	//
 	this->mShader->Use();
 	this->mCamera->ApplyEffects(*mShader);
 	this->mLight->ApplyEffects(*mShader);
@@ -69,8 +79,8 @@ void Game::Render() {
 	GenerateSceneItems();
 
 	//Draw the block
-	for (int y = 0; y < LANES_Y_COUNT; ++y) {
-		for (int x = 0; x < LANES_X_COUNT; ++x) {
+		for (int y = 0; y < LANES_Y_COUNT; ++y) {
+			for (int x = 0; x < LANES_X_COUNT; ++x) {
 			for (int z = 0;z < this->mGrid[y][x].size(); ++z) {
 				GameItem cell = this->mGrid[y][x].front();
 				this->mGrid[y][x].pop();
@@ -105,6 +115,15 @@ void Game::Render() {
 			}
 		}
 	}
+	//----------------------------------------------
+
+	//
+	// Draw Text
+	//
+	stringstream ss;
+	ss << "FPS: " << this->mEngine->mTimer->FPS;
+	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+	//----------------------------------------------
 }
 
 /* Processes inputs from keyboard */
@@ -146,6 +165,13 @@ void Game::ProcessMouseInput() {
 	this->mCamera->ChangeDirection(xpos, ypos, this->mEngine->mTimer->ElapsedFramesTime);
 }
 
+/* Initializes the game sounds and background music */
+void Game::InitSounds() {
+	this->mSoundEngine = createIrrKlangDevice();
+
+	this->mSoundEngine->play2D("Sounds/Conan.mp3", GL_TRUE);
+}
+
 /* Initializes the game camera */
 void Game::InitCamera() {
 	int w, h;
@@ -156,6 +182,7 @@ void Game::InitCamera() {
 /* Initializes the game shaders */
 void Game::InitShaders() {
 	this->mShader = new Shader("Shaders/lighting_vertex.shader", "Shaders/lighting_fragment.shader");
+	this->mTextShader = new Shader("Shaders/text_vertex.shader", "Shaders/text_fragment.shader");
 }
 
 /* Initializes the game models */
@@ -222,7 +249,7 @@ void Game::GenerateSceneItems() {
 		}
 		mBlockSliceIdx++;
 	}
-}
+				}
 
 
 
@@ -240,5 +267,11 @@ void Game::ClearGrid() {
 		// moves the Z porition of the camera back to it's initial position
 		//this->mCamera->SetPosition(glm::vec3(cameraPosition.x, cameraPosition.y, CAMERA_POSITION.z));
 	}
+}
 
+/* Initializes the game text renderers */
+void Game::InitTextRenderers() {
+	int w, h;
+	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
+	this->mTextRenderer = new TextRenderer("Fonts/segoeui.ttf", 48, w, h);
 }

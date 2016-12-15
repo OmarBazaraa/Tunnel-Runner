@@ -98,9 +98,11 @@ void GameEngine::InitWindow(int width, int height, const char* title, bool fulls
 	// Setup OpenGL options
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_DEPTH_TEST);
-
-	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS);
+	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);		// Accept fragment if it closer to the camera than the former one
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Specify the polygon drawing mode: fill, line or point
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

@@ -16,6 +16,7 @@ class FrameTimer
 public:
 	// Time
 	int FramesCount;			// FPS counter
+	int FPS;
 	double LastTime;
 	double LastFrameTime;  		// Time of last frame
 	double CurrentFrameTime;	// Start time of the current frame
