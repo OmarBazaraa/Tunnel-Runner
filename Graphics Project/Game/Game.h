@@ -7,6 +7,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Sound Library Include
+#include <irrklang/irrKlang.h>
+using namespace irrklang;
+
 // Other includes
 #include "../Game/GameEngine.h"
 #include "../Components/Shader.h"
@@ -63,6 +67,9 @@ private:
 	// Game engine
 	GameEngine* mEngine;
 
+	// Sound Engine
+	ISoundEngine* mSoundEngine;
+
 	// Shaders
 	Shader* mShader;
 	Shader* mTextShader;
@@ -110,6 +117,9 @@ private:
 
 	/* Processes inputs from mouse */
 	void ProcessMouseInput();
+
+	/* Initializes the game sounds and background music */
+	void InitSounds();
 
 	/* Initializes the game camera */
 	void InitCamera();

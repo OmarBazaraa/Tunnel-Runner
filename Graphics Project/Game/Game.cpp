@@ -5,6 +5,7 @@ Game::Game(GameEngine* engine, const char* title) {
 	this->mEngine = engine;
 	this->mEngine->RegisterGame(this, title);
 
+	InitSounds();
 	InitCamera();
 	InitShaders();
 	InitModels();
@@ -154,6 +155,13 @@ void Game::ProcessMouseInput() {
 	double xpos, ypos;
 	glfwGetCursorPos(this->mEngine->mWind, &xpos, &ypos);
 	this->mCamera->ChangeDirection(xpos, ypos, this->mEngine->mTimer->ElapsedFramesTime);
+}
+
+/* Initializes the game sounds and background music */
+void Game::InitSounds() {
+	this->mSoundEngine = createIrrKlangDevice();
+
+	this->mSoundEngine->play2D("Sounds/Conan.mp3", GL_TRUE);
 }
 
 /* Initializes the game camera */
