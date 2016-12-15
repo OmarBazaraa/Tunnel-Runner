@@ -95,7 +95,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\OpenGL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;SOIL.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;SOIL.lib;assimp.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -130,7 +130,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\OpenGL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;SOIL.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;SOIL.lib;assimp.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,13 +157,13 @@
     <ClCompile Include="Components\Mesh.cpp" />
     <ClCompile Include="Components\Model.cpp" />
     <ClCompile Include="Components\Shader.cpp" />
+    <ClCompile Include="Components\TextRenderer.cpp" />
     <ClCompile Include="Components\Texture.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GameEngine.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Utils\FrameTimer.cpp" />
     <ClCompile Include="Utils\Sound.cpp" />
-    <ClCompile Include="Utils\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Components\Camera.h" />
@@ -171,16 +171,18 @@
     <ClInclude Include="Components\Mesh.h" />
     <ClInclude Include="Components\Model.h" />
     <ClInclude Include="Components\Shader.h" />
+    <ClInclude Include="Components\TextRenderer.h" />
     <ClInclude Include="Components\Texture.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\GameEngine.h" />
     <ClInclude Include="Utils\FrameTimer.h" />
     <ClInclude Include="Utils\Sound.h" />
-    <ClInclude Include="Utils\Text.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\lighting_fragment.shader" />
     <None Include="Shaders\lighting_vertex.shader" />
+    <None Include="Shaders\text_fragment.shader" />
+    <None Include="Shaders\text_vertex.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

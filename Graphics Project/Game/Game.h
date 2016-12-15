@@ -14,6 +14,7 @@
 #include "../Components/Model.h"
 #include "../Components/Camera.h"
 #include "../Components/LightSource.h"
+#include "../Components/TextRenderer.h"
 
 
 /*
@@ -64,6 +65,7 @@ private:
 
 	// Shaders
 	Shader* mShader;
+	Shader* mTextShader;
 
 	// Models
 	Model* mScene;
@@ -79,11 +81,13 @@ private:
 	// Light sources
 	LightSource* mLight;
 
+	// Text renderers
+	TextRenderer* mTextRenderer;
+
 	// Camera
 	double mCameraSpeed = 2;
 	Camera* mCamera;
 	
-
 public:
 	/* Constructs a new game with all related objects and components */
 	Game(GameEngine* engine, const char* title);
@@ -119,8 +123,9 @@ private:
 	/* Initializes the game light sources */
 	void InitLightSources();
 
-
 	/* Initialezies the game blocks */
 	void InitGameBlocks();
 
+	/* Initializes the game text renderers */
+	void InitTextRenderers();
 };

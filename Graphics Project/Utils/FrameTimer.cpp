@@ -3,6 +3,7 @@
 /* Constructor */
 FrameTimer::FrameTimer() {
 	this->FramesCount = 0;
+	this->FPS = 0;
 	this->LastTime = 0;
 	this->LastFrameTime = 0;
 	this->CurrentFrameTime = 0;
@@ -22,8 +23,10 @@ void FrameTimer::ProcessFrameTime(double time) {
 	this->FramesCount++;
 
 	if (this->CurrentFrameTime - this->LastTime >= SECOND) {
-		std::cout << "FPS: " << this->FramesCount << std::endl;
+		this->FPS = this->FramesCount;
 		this->FramesCount = 0;
 		this->LastTime += SECOND;
+
+		//std::cout << "FPS: " << this->FPS << std::endl;
 	}
 }

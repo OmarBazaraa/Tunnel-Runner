@@ -10,6 +10,7 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitModels();
 	InitLightSources();
 	InitGameBlocks();
+	InitTextRenderers();
 }
 
 /* Destructs the game and free resources */
@@ -19,6 +20,7 @@ Game::~Game() {
 
 	// Destroy shaders
 	delete this->mShader;
+	delete this->mTextShader;
 
 	// Destroy models
 	delete this->mScene;
@@ -29,6 +31,9 @@ Game::~Game() {
 
 	// Destroy light sources
 	delete this->mLight;
+
+	// Destroy text renderers
+	delete this->mTextRenderer;
 }
 
 /* Receives user input and processes it for the next frame */
@@ -53,6 +58,9 @@ void Game::Update() {
 
 /* Renders the new frame */
 void Game::Render() {
+	//
+	// Draw Models
+	//
 	this->mShader->Use();
 	this->mCamera->ApplyEffects(*mShader);
 	this->mLight->ApplyEffects(*mShader);
@@ -98,6 +106,15 @@ void Game::Render() {
 			}
 		}
 	}
+	//----------------------------------------------
+
+	//
+	// Draw Text
+	//
+	stringstream ss;
+	ss << "FPS: " << this->mEngine->mTimer->FPS;
+	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+	//----------------------------------------------
 }
 
 /* Processes inputs from keyboard */
@@ -149,6 +166,7 @@ void Game::InitCamera() {
 /* Initializes the game shaders */
 void Game::InitShaders() {
 	this->mShader = new Shader("Shaders/lighting_vertex.shader", "Shaders/lighting_fragment.shader");
+	this->mTextShader = new Shader("Shaders/text_vertex.shader", "Shaders/text_fragment.shader");
 }
 
 /* Initializes the game models */
@@ -191,4 +209,11 @@ void Game::InitGameBlocks() {
 			}
 		}
 	}
+}
+
+/* Initializes the game text renderers */
+void Game::InitTextRenderers() {
+	int w, h;
+	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
+	this->mTextRenderer = new TextRenderer("Fonts/segoeui.ttf", 48, w, h);
 }

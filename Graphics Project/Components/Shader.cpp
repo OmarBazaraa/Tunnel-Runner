@@ -124,4 +124,8 @@ void Shader::SetupLocations() {
 	this->LightAttenConstantLoc = glGetUniformLocation(this->ProgramID, LIGHT_ATTEN_CONSTANT_LOC);
 	this->LightAttenLinearLoc = glGetUniformLocation(this->ProgramID, LIGHT_ATTEN_LINEAR_LOC);
 	this->LightAttenQuadraticLoc = glGetUniformLocation(this->ProgramID, LIGHT_ATTEN_QUADRATIC_LOC);
+
+	// Text
+	this->TextSamplerLoc = glGetUniformLocation(this->ProgramID, TEXT_SAMPLER_LOC);
+	this->TextColorLoc = glGetUniformLocation(this->ProgramID, TEXT_COLOR_LOC);
 }

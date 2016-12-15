@@ -32,6 +32,8 @@ using namespace std;
 #define LIGHT_ATTEN_CONSTANT_LOC		"light.atten_constant"
 #define LIGHT_ATTEN_LINEAR_LOC			"light.atten_linear"
 #define LIGHT_ATTEN_QUADRATIC_LOC		"light.atten_quadratic"
+#define TEXT_SAMPLER_LOC				"text"
+#define TEXT_COLOR_LOC					"text_color"
 
 /*
 	A shader program class which compiles vertex and fragment shaders
@@ -44,14 +46,14 @@ public:
 	GLuint ProgramID;
 
 	// Vertex Attributes
-	GLuint VertexPositionLoc;
-	GLuint VertexNormalLoc;
-	GLuint VertexTextureCoordLoc;
+	GLint VertexPositionLoc;
+	GLint VertexNormalLoc;
+	GLint VertexTextureCoordLoc;
 
 	// Matrices
-	GLuint ModelMatrixLoc;
-	GLuint ViewMatrixLoc;
-	GLuint ProjectionMatrixLoc;
+	GLint ModelMatrixLoc;
+	GLint ViewMatrixLoc;
+	GLint ProjectionMatrixLoc;
 
 	// Camera
 	GLint CameraPositionLoc;
@@ -73,6 +75,10 @@ public:
 	GLint LightAttenConstantLoc;
 	GLint LightAttenLinearLoc;
 	GLint LightAttenQuadraticLoc;
+
+	// Text
+	GLint TextSamplerLoc;
+	GLint TextColorLoc;
 
 	/* Compiles and links the vertex and fragment shaders into a program */
 	Shader(const char* vertex_path, const char* fragment_path);
