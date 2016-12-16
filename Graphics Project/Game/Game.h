@@ -1,8 +1,11 @@
 #pragma once
 
 // STL Includes
-#include <time.h>
+#include <string>
+#include <vector>
 #include <queue>
+#include <time.h>
+using namespace std;
 
 // GL Includes
 #include <glm/gtc/matrix_transform.hpp>
@@ -53,6 +56,14 @@ const double COIN_SIZE = 0.2;
 const double RING_RADIUS = 1.0;
 const double RING_DEPTH = 0.2;
 
+// Font constants
+const double FONT_SIZE = 48.0f;
+const double FONT_MARGIN = 25.0f;
+const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
+
+// Menu constants
+const string MENU_MSG = "Press ENTER to quit, ESQ to resume";
+
 // Camera constants
 const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
 const double CAMERA_ACCELERATION = 0.001;
@@ -68,7 +79,7 @@ private:
 	// Game engine
 	GameEngine* mEngine;
 
-	// Sound Engine
+	// Sound engine
 	ISoundEngine* mSoundEngine;
 
 	// Shaders
@@ -82,16 +93,20 @@ private:
 	Model* mCube;
 	Model* mRing;
 
-	// Game grid
-	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
-	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
-	int mBlockId;
-
 	// Light sources
 	LightSource* mLight;
 
 	// Text renderers
 	TextRenderer* mTextRenderer;
+
+	// Game properties and variables
+	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
+	int mBlockId;
+	int mScore = 0;
+
+	// Menu variables
+	bool mIsPaused = false;
 
 	// Camera
 	double mCameraSpeed = 4;
@@ -117,6 +132,9 @@ public:
 private:
 	/* Processes inputs from keyboard */
 	void ProcessKeyInput();
+
+	/* Processes inputs for the game menu while the game is paused */
+	void ProcessMenuInput();
 
 	/* Processes inputs from mouse */
 	void ProcessMouseInput();
@@ -144,7 +162,6 @@ private:
 
 	/* Generates all of the scene items */
 	void GenerateSceneItems();
-
 
 	/* Clears the grid queue from extra scenes that will not be drawn */
 	void ClearGrid();

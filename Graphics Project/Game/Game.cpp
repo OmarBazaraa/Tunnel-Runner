@@ -17,6 +17,9 @@ Game::Game(GameEngine* engine, const char* title) {
 
 /* Destructs the game and free resources */
 Game::~Game() {
+	// Destroy engines
+	delete this->mSoundEngine;
+
 	// Destroy camera
 	delete this->mCamera;
 
@@ -46,6 +49,10 @@ void Game::ProcessInput() {
 
 /* Updates objects' information needed to apply effects on the next frame  */
 void Game::Update() {
+	if (this->mIsPaused) {
+		return;
+	}
+
 	// Update camera
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 
@@ -54,7 +61,6 @@ void Game::Update() {
 	this->mLight->Position -= this->mCamera->GetFront();
 
 	// Update models
-
 
 }
 
@@ -72,16 +78,16 @@ void Game::Render() {
 	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
-	//Draw the scene
+	// Draw the scene
 	this->mScene->Draw(*this->mShader);
 
-	// populate the game items (mGrid) to be rendered
+	// Populate the game items (mGrid) to be rendered
 	GenerateSceneItems();
 
 	//Draw the block
-		for (int y = 0; y < LANES_Y_COUNT; ++y) {
-			for (int x = 0; x < LANES_X_COUNT; ++x) {
-			for (int z = 0;z < this->mGrid[y][x].size(); ++z) {
+	for (int y = 0; y < LANES_Y_COUNT; ++y) {
+		for (int x = 0; x < LANES_X_COUNT; ++x) {
+			for (int z = 0; z < this->mGrid[y][x].size(); ++z) {
 				GameItem cell = this->mGrid[y][x].front();
 				this->mGrid[y][x].pop();
 				this->mGrid[y][x].push(cell);
@@ -121,15 +127,36 @@ void Game::Render() {
 	// Draw Text
 	//
 	stringstream ss;
+	ss << "Score: " << this->mScore;
+	int w, h;
+	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
+	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), FONT_MARGIN, h - FONT_MARGIN - FONT_SIZE, 1.0f, FONT_COLOR);
+
+	ss.clear();
+	ss.str("");
 	ss << "FPS: " << this->mEngine->mTimer->FPS;
-	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), FONT_MARGIN, FONT_MARGIN, 1.0f, FONT_COLOR);
+	//----------------------------------------------
+
+	//
+	// Draw Menu
+	//
+	if (this->mIsPaused) {
+		this->mTextRenderer->RenderText(*this->mTextShader, MENU_MSG, w / 2 - MENU_MSG.size() / 4 * FONT_SIZE * 0.5, h / 2 - FONT_SIZE * 0.5, 0.5f, FONT_COLOR);
+	}
 	//----------------------------------------------
 }
 
 /* Processes inputs from keyboard */
 void Game::ProcessKeyInput() {
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(this->mEngine->mWind, GL_TRUE);
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		this->mIsPaused = !this->mIsPaused;
+	}
+
+	if (this->mIsPaused) {
+		this->ProcessMenuInput();
+		return;
+	}
 
 	/*if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_W) == GLFW_PRESS)
 		this->mCamera->Move(FORWARD, this->mEngine->mTimer->ElapsedFramesTime);
@@ -158,8 +185,18 @@ void Game::ProcessKeyInput() {
 		this->mCamera->StartAnimation(JUMP, JUMP_OFFSET);
 }
 
+/* Processes inputs for the game menu while the game is paused */
+void Game::ProcessMenuInput() {
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ENTER) == GLFW_PRESS)
+		glfwSetWindowShouldClose(this->mEngine->mWind, GL_TRUE);
+}
+
 /* Processes inputs from mouse */
 void Game::ProcessMouseInput() {
+	if (this->mIsPaused) {
+		return;
+	}
+
 	double xpos, ypos;
 	glfwGetCursorPos(this->mEngine->mWind, &xpos, &ypos);
 	this->mCamera->ChangeDirection(xpos, ypos, this->mEngine->mTimer->ElapsedFramesTime);
@@ -168,7 +205,6 @@ void Game::ProcessMouseInput() {
 /* Initializes the game sounds and background music */
 void Game::InitSounds() {
 	this->mSoundEngine = createIrrKlangDevice();
-
 	this->mSoundEngine->play2D("Sounds/Conan.mp3", GL_TRUE);
 }
 
@@ -212,7 +248,7 @@ void Game::InitLightSources() {
 	this->mLight->AttenuationQuadratic = 0.032f;
 }
 
-/* Initialezies the game blocks */
+/* Initializes the game blocks */
 void Game::InitGameBlocks() {
 	for (int b = 0; b < BLOCKS_COUNT; b++) {
 		for (int z = 0; z < LANES_Z_COUNT; ++z) {
@@ -225,6 +261,12 @@ void Game::InitGameBlocks() {
 	}
 }
 
+/* Initializes the game text renderers */
+void Game::InitTextRenderers() {
+	int w, h;
+	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
+	this->mTextRenderer = new TextRenderer("Fonts/segoeui.ttf", 48, w, h);
+}
 
 /* Generates all of the scene items */
 void Game::GenerateSceneItems() {
@@ -251,8 +293,6 @@ void Game::GenerateSceneItems() {
 	}
 				}
 
-
-
 /* Clears the grid queue from extra scenes that will not be drawn */
 void Game::ClearGrid() {
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
@@ -267,11 +307,4 @@ void Game::ClearGrid() {
 		// moves the Z porition of the camera back to it's initial position
 		//this->mCamera->SetPosition(glm::vec3(cameraPosition.x, cameraPosition.y, CAMERA_POSITION.z));
 	}
-}
-
-/* Initializes the game text renderers */
-void Game::InitTextRenderers() {
-	int w, h;
-	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
-	this->mTextRenderer = new TextRenderer("Fonts/segoeui.ttf", 48, w, h);
 }
