@@ -80,6 +80,7 @@ const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 const string MENU_MSG = "Press Q to quit, R to replay";
 const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score: ";
+const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
 
 // Camera constants
