@@ -60,6 +60,7 @@ const double MIN_FOV = 1.0f;
 const double ASPECT_RATIO = 1.3333f;
 const double NEAR_PLANE = 0.1f;
 const double FAR_PLANE = 100.0f;
+const double CAMERA_OFFSET = 1.0f;
 
 /*
 	An abstract camera class that processes input and calculates the corresponding
