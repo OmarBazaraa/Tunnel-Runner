@@ -261,6 +261,19 @@ void Game::ResetGame() {
 	// TODO: Set game intial values here
 	this->mScore = 0;
 	this->mGameState = RUNNING;
+	this->mBlockSliceIdx = 0;
+	this->mCameraSpeed = CAMERA_SPEED_INIT;
+	this->mZGridIndex = 0;
+	this->mCamera->SetPosition(CAMERA_POSITION);
+	this->mBlockSliceIdx = 0;
+	this->mBlockId = 0;
+	for (int x = 0; x < LANES_X_COUNT; ++x) {
+		for (int y = 0; y < LANES_Y_COUNT; ++y) {
+			while (!mGrid[x][y].empty())
+				this->mGrid[x][y].pop();
+		}
+	}
+	std::cout << mGrid[0][0].size() << endl;
 }
 
 /* Initializes the game sounds and background music */

@@ -85,6 +85,7 @@ const string FPS_LABEL = "FPS: ";
 // Camera constants
 const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
 const double CAMERA_ACCELERATION = 0.01;
+const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_SPEED_MAX = 15;
 const double JUMP_OFFSET = 1.5f;
 
@@ -122,7 +123,7 @@ private:
 	bool mEscReleased = true;
 
 	// Camera
-	double mCameraSpeed = 4;
+	double mCameraSpeed = CAMERA_SPEED_INIT;
 	int mZGridIndex = 0, mBlockSliceIdx = 0;
 	Camera* mCamera;
 	GameItem mColliding;
