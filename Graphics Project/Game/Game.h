@@ -46,13 +46,13 @@ const int LANES_X_COUNT = 3;
 const int LANES_Y_COUNT = 4;
 const int LANES_Z_COUNT = 20;
 const int BLOCKS_COUNT = 5;
-const double LANE_SIZE = 2.5f;
-const double LANE_DEPTH = 2.5f;
+const double LANE_WIDTH = 1.5f;
+const double LANE_DEPTH = 1.5f;
 const double LANE_HEIGHT = 1.0f;
-const double SCENE_WIDTH = LANES_X_COUNT * LANE_SIZE;
+const double SCENE_WIDTH = LANES_X_COUNT * LANE_WIDTH;
 const double SCENE_HEIGHT = LANES_Y_COUNT * LANE_HEIGHT;
 const double SCENE_DEPTH = LANES_Z_COUNT * LANE_DEPTH;
-const double CUBE_SIZE = LANE_SIZE;
+const double CUBE_SIZE = LANE_WIDTH;
 const double CUBE_HEIGHT = LANE_HEIGHT;
 const double CUBE_DEPTH = LANE_DEPTH;
 const double SPHERE_RADIUS = 0.5f;
@@ -65,9 +65,8 @@ const double FONT_SIZE = 48.0f;
 const double FONT_MARGIN = 25.0f;
 const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 
-// Strings and messages
+// Menu constants
 const string MENU_MSG = "Press ENTER to quit, ESQ to resume";
-const string GAME_OVER_MSG = "Game Over";
 
 // Camera constants
 const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);

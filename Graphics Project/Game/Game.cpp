@@ -70,7 +70,7 @@ void Game::Update() {
 
 	// Update collision
 	int y = int((cameraPosition.y - CAMERA_POSITION.y) / LANE_HEIGHT);
-	int x = int((cameraPosition.x - CAMERA_POSITION.x) / LANE_SIZE) + (LANES_X_COUNT - 1) / 2;
+	int x = int((cameraPosition.x - CAMERA_POSITION.x) / LANE_WIDTH) + (LANES_X_COUNT - 1) / 2;
 	if (y >= 0 && y<LANES_Y_COUNT && x >= 0 && x<LANES_X_COUNT)
 		this->mColliding = this->mGrid[y][x].front();
 
@@ -102,23 +102,23 @@ void Game::Render() {
 				switch (cell)
 				{
 				case BLOCK:
-					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, 0.5f * CUBE_HEIGHT + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
-					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_SIZE));
+					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, 0.5f * CUBE_HEIGHT + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
+					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_DEPTH));
 					this->mCube->Draw(*this->mShader);
 					break;
 				case COIN:
-					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, COIN_SIZE + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
+					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, COIN_SIZE + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
 					this->mCoin->ModelMatrix = glm::scale(this->mCoin->ModelMatrix, glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
 					break;
 				case SPHERE:
-					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, SPHERE_RADIUS + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
+					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, SPHERE_RADIUS + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
 					this->mSphere->ModelMatrix = glm::scale(this->mSphere->ModelMatrix, glm::vec3(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS));
 					this->mSphere->Draw(*this->mShader);
 					break;
 				case RING:
-					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, RING_RADIUS + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
+					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, RING_RADIUS + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
 					this->mRing->ModelMatrix = glm::scale(this->mRing->ModelMatrix, glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
 					this->mRing->Draw(*this->mShader);
 					break;
@@ -190,9 +190,9 @@ void Game::ProcessKeyInput() {
 	//mCameraSpeed += CAMERA_ACCELERATION;
 
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
-		this->mCamera->StartAnimation(MOVE_LEFT, LANE_SIZE);
+		this->mCamera->StartAnimation(MOVE_LEFT, LANE_WIDTH);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
-		this->mCamera->StartAnimation(MOVE_RIGHT, LANE_SIZE);
+		this->mCamera->StartAnimation(MOVE_RIGHT, LANE_WIDTH);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS)
 		this->mCamera->StartAnimation(JUMP, JUMP_OFFSET);
 }
