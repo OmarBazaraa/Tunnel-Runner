@@ -166,13 +166,11 @@ void Game::Render() {
 
 /* Renders the text of the game */
 void Game::RenderText() {
-	//
-	// Draw Score and FPS
-	//
-	int w, h;
+	int w, h, textWidth;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
-
 	stringstream ss;
+
+	// Score
 	ss << SCORE_LABEL << this->mScore;
 	this->mTextRenderer->RenderText(
 		*this->mTextShader,
@@ -183,6 +181,21 @@ void Game::RenderText() {
 		FONT_COLOR
 	);
 
+	// Time
+	ss.clear();
+	ss.str("");
+	ss << TIME_LABEL << (int)this->mEngine->mTimer->CurrentFrameTime;
+	textWidth = this->mTextRenderer->GetTextWidth(ss.str(), FONT_SCALE);
+	this->mTextRenderer->RenderText(
+		*this->mTextShader,
+		ss.str(),
+		w - FONT_MARGIN * 8,
+		h - FONT_MARGIN - FONT_SIZE,
+		FONT_SCALE,
+		FONT_COLOR
+	);
+
+	// FPS
 	ss.clear();
 	ss.str("");
 	ss << FPS_LABEL << this->mEngine->mTimer->FPS;
@@ -200,12 +213,12 @@ void Game::RenderText() {
 	// Draw Menu
 	//
 	if (this->mGameState == LOST) {
-		int width = this->mTextRenderer->GetTextWidth(GAME_OVER_MSG, MENU_FONT_SCALE);
+		textWidth = this->mTextRenderer->GetTextWidth(GAME_OVER_MSG, MENU_FONT_SCALE);
 
 		this->mTextRenderer->RenderText(
 			*this->mTextShader,
 			GAME_OVER_MSG,
-			(w - width) / 2,
+			(w - textWidth) / 2,
 			h / 2 - FONT_SIZE * MENU_FONT_SCALE + FONT_MARGIN * 2,
 			MENU_FONT_SCALE,
 			FONT_COLOR
@@ -213,12 +226,12 @@ void Game::RenderText() {
 	}
 
 	if (this->mGameState != RUNNING) {
-		int width = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
+		textWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
 
 		this->mTextRenderer->RenderText(
 			*this->mTextShader,
 			MENU_MSG,
-			(w - width) / 2,
+			(w - textWidth) / 2,
 			h / 2 - FONT_SIZE * MENU_FONT_SCALE,
 			MENU_FONT_SCALE,
 			FONT_COLOR
