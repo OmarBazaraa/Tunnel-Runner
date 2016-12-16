@@ -90,7 +90,7 @@ void Game::Collide(glm::vec3 character) {
 	mColliding.Left = mColliding.Right = EMPTY;
 	int x = character.x / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
 	int y = character.y / LANE_HEIGHT;
-	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT) {
+	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
 		colliding = this->mGrid[y][x].front();
 
 		if (x == 0)mColliding.Left = BLOCK;
