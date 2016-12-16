@@ -182,6 +182,9 @@
     <None Include="Shaders\text_fragment.shader" />
     <None Include="Shaders\text_vertex.shader" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Levels\Level.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

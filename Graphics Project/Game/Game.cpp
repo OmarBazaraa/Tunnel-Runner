@@ -11,7 +11,6 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitGameBlocks();
 	InitModels();
 	InitLightSources();
-	InitGameBlocks();
 	InitTextRenderers();
 }
 
@@ -99,23 +98,23 @@ void Game::Render() {
 				switch (cell)
 				{
 				case BLOCK:
-					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, 0.5f * CUBE_HEIGHT + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
+					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, 0.5f * CUBE_HEIGHT + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_SIZE));
 					this->mCube->Draw(*this->mShader);
 					break;
 				case COIN:
-					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, COIN_SIZE + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
+					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, COIN_SIZE + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mCoin->ModelMatrix = glm::scale(this->mCoin->ModelMatrix, glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
 					break;
 				case SPHERE:
-					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, SPHERE_RADIUS + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
+					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, SPHERE_RADIUS + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mSphere->ModelMatrix = glm::scale(this->mSphere->ModelMatrix, glm::vec3(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS));
 					this->mSphere->Draw(*this->mShader);
 					break;
 				case RING:
-					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 2) * LANE_SIZE, RING_RADIUS + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
+					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_SIZE + 1) / 2) * LANE_SIZE, RING_RADIUS + y * LANE_SIZE, -(z + mZGridIndex) * LANE_SIZE));
 					this->mRing->ModelMatrix = glm::scale(this->mRing->ModelMatrix, glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
 					this->mRing->Draw(*this->mShader);
 					break;
@@ -254,11 +253,26 @@ void Game::InitLightSources() {
 
 /* Initializes the game blocks */
 void Game::InitGameBlocks() {
+	ifstream in;
+	in.open("Levels/Level.txt");
+	if (!in.is_open()) {
+		std::cout << "couldn't load the level file\n";
+		return;
+	}
+	string line;
+
 	for (int b = 0; b < BLOCKS_COUNT; b++) {
-		for (int z = 0; z < LANES_Z_COUNT; ++z) {
-			for (int y = 0; y < LANES_Y_COUNT; ++y) {
-				for (int x = 0; x < LANES_X_COUNT; ++x) {
-					mSceneBlocks[b][z][y][x] = (GameItem)(b);
+		for (int y = 0; y < LANES_Y_COUNT; ++y) {
+			for (int x = 0; x < LANES_X_COUNT; ++x) {
+				in >> line;
+				//line is empty or a comment
+				if (line.size() == 0 || line[0] == '#') {
+					x--;
+					continue;
+				}
+
+				for (int z = 0; z < LANES_Z_COUNT; ++z) {
+					mSceneBlocks[b][z][y][x] = (GameItem)(line[z] - '0');
 				}
 			}
 		}

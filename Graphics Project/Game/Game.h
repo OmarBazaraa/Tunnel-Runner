@@ -5,6 +5,7 @@
 #include <vector>
 #include <queue>
 #include <time.h>
+#include <fstream>
 using namespace std;
 
 // GL Includes
@@ -41,16 +42,16 @@ enum GameItem {
 class GameEngine;
 
 // Scene constants
-const int LANES_X_COUNT = 5;
-const int LANES_Y_COUNT = 3;
+const int LANES_X_COUNT = 3;
+const int LANES_Y_COUNT = 4;
 const int LANES_Z_COUNT = 20;
 const int BLOCKS_COUNT = 5;
-const double LANE_SIZE = 1.5f;
+const double LANE_SIZE = 2.5f;
 const double SCENE_WIDTH = LANES_X_COUNT * LANE_SIZE;
 const double SCENE_HEIGHT = LANES_Y_COUNT * LANE_SIZE;
 const double SCENE_DEPTH = LANES_Z_COUNT * LANE_SIZE;
 const double CUBE_SIZE = LANE_SIZE;
-const double CUBE_HEIGHT = 1.0;
+const double CUBE_HEIGHT = LANE_SIZE;
 const double SPHERE_RADIUS = 0.5f;
 const double COIN_SIZE = 0.2;
 const double RING_RADIUS = 1.0;
