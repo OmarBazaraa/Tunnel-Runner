@@ -45,7 +45,7 @@ Game::~Game() {
 /* Receives user input and processes it for the next frame */
 void Game::ProcessInput() {
 	this->ProcessKeyInput();
-	this->ProcessMouseInput();
+	//this->ProcessMouseInput();
 }
 
 /* Updates objects' information needed to apply effects on the next frame  */
@@ -61,6 +61,10 @@ void Game::Update() {
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
+	// Moves the camera forward every frame by default
+	this->mCamera->SetMoveSpeed(mCameraSpeed);
+	this->mCamera->MoveStep(FORWARD, LANE_DEPTH);
+	//this->mCameraSpeed += CAMERA_ACCELERATION;
 
 	// Move the scene with the camera to make it feel endless
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
@@ -87,6 +91,7 @@ void Game::Update() {
 
 /* Renders the new frame */
 void Game::Render() {
+	// Apply effect to the shader
 	this->mShader->Use();
 	this->mCamera->ApplyEffects(*mShader);
 	this->mLight->ApplyEffects(*mShader);
@@ -124,8 +129,6 @@ void Game::Render() {
 					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, RING_RADIUS + y * LANE_HEIGHT, -(z + mZGridIndex) * LANE_DEPTH));
 					this->mRing->ModelMatrix = glm::scale(this->mRing->ModelMatrix, glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
 					this->mRing->Draw(*this->mShader);
-					break;
-				default:
 					break;
 				}
 			}
@@ -213,31 +216,12 @@ void Game::ProcessKeyInput() {
 		return;
 	}
 
-	/*if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_W) == GLFW_PRESS)
-		this->mCamera->Move(FORWARD, this->mEngine->mTimer->ElapsedFramesTime);
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_S) == GLFW_PRESS)
-		this->mCamera->Move(BACKWARD, this->mEngine->mTimer->ElapsedFramesTime);
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
-		this->mCamera->Move(RIGHT, this->mEngine->mTimer->ElapsedFramesTime);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
-		this->mCamera->Move(LEFT, this->mEngine->mTimer->ElapsedFramesTime);
-
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_W) == GLFW_PRESS)
-		this->mCamera->StartAnimation(MOVE_FORWARD, LANE_DEPTH);
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_S) == GLFW_PRESS)
-		this->mCamera->StartAnimation(MOVE_BACKWARD, LANE_DEPTH);*/
-
-	/* Moves the camera forward every frame by default */
-	this->mCamera->SetMoveSpeed(mCameraSpeed);
-	this->mCamera->StartAnimation(MOVE_FORWARD, LANE_DEPTH);
-	//mCameraSpeed += CAMERA_ACCELERATION;
-
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
-		this->mCamera->StartAnimation(MOVE_LEFT, LANE_WIDTH);
+		this->mCamera->MoveStep(LEFT, LANE_WIDTH);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
-		this->mCamera->StartAnimation(MOVE_RIGHT, LANE_WIDTH);
+		this->mCamera->MoveStep(RIGHT, LANE_WIDTH);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS)
-		this->mCamera->StartAnimation(JUMP, JUMP_OFFSET);
+		this->mCamera->Jump(CAMERA_JUMP_OFFSET);
 }
 
 /* Processes inputs for the game menu while the game is paused */

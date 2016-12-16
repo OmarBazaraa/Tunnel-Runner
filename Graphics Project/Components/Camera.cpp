@@ -20,6 +20,7 @@ Camera::Camera(glm::vec3 position, double aspect) {
 	this->mIsJumping = false;
 	this->mJumpVelocity = JUMP_SPEED;
 	this->mJumpAcceleration = JUMP_ACCELERATION;
+	this->mGroundPosition = position.y;
 	// Look around
 	this->mMouseSensitivity = MOUSE_SENSITIVTY;
 
@@ -41,6 +42,16 @@ Camera::Camera(glm::vec3 position, double aspect) {
 /* Destructor */
 Camera::~Camera() {
 	
+}
+
+/* Sets the position of the ground/gravity, needed to apply falling effect */
+void Camera::SetGravityPosition(double ypos) {
+	if (this->mGroundPosition > ypos && !this->mIsJumping) {
+		this->mJumpVelocity = 0.0f;
+		this->mIsJumping = true;
+	}
+
+	this->mGroundPosition = ypos;
 }
 
 /* Sets the movement speed of the camera */
@@ -80,11 +91,11 @@ void Camera::ApplyEffects(const Shader& shader) {
 	glUniform3f(shader.CameraPositionLoc, this->mPosition.x, this->mPosition.y, this->mPosition.z);
 }
 
-/* Starts a specified camera animation */
-void Camera::StartAnimation(CameraAnimationType type, double offset) {
+/* Moves the camera a step in a certain direction */
+void Camera::MoveStep(CameraDirection type, double offset) {
 	switch (type)
 	{
-	case MOVE_FORWARD:
+	case FORWARD:
 		if (!this->mIsMovingForwardStep) {
 			this->mIsMovingForwardStep = true;
 			this->mMoveForwardDirection = -1.0;
@@ -92,7 +103,7 @@ void Camera::StartAnimation(CameraAnimationType type, double offset) {
 			this->mMoveForwardDestination = this->mPosition.z - offset;
 		}
 		break;
-	case MOVE_BACKWARD:
+	case BACKWARD:
 		if (!this->mIsMovingForwardStep) {
 			this->mIsMovingForwardStep = true;
 			this->mMoveForwardDirection = 1.0;
@@ -100,7 +111,7 @@ void Camera::StartAnimation(CameraAnimationType type, double offset) {
 			this->mMoveForwardDestination = this->mPosition.z + offset;
 		}
 		break;
-	case MOVE_LEFT:
+	case LEFT:
 		if (!this->mIsMovingHorizontalStep) {
 			this->mIsMovingHorizontalStep = true;
 			this->mMoveHorizontalDirection = -1.0;
@@ -108,7 +119,7 @@ void Camera::StartAnimation(CameraAnimationType type, double offset) {
 			this->mMoveHorizontalDestination = this->mPosition.x - offset;
 		}
 		break;
-	case MOVE_RIGHT:
+	case RIGHT:
 		if (!this->mIsMovingHorizontalStep) {
 			this->mIsMovingHorizontalStep = true;
 			this->mMoveHorizontalDirection = 1.0;
@@ -116,23 +127,21 @@ void Camera::StartAnimation(CameraAnimationType type, double offset) {
 			this->mMoveHorizontalDestination = this->mPosition.x + offset;
 		}
 		break;
-	case JUMP:
-		if (!this->mIsJumping) {
-			this->mIsJumping = true;
-			this->mJumpVelocity = JUMP_SPEED;
-			this->mJumpOffset = offset;
-			this->mJumpDestination = this->mPosition.y;
-		}
-		break;
-	default:
+	}
+}
 
-		break;
+/* Starts jumping animation */
+void Camera::Jump(double offset) {
+	if (!this->mIsJumping) {
+		this->mIsJumping = true;
+		this->mJumpVelocity = JUMP_SPEED;
+		this->mJumpOffset = offset;
 	}
 }
 
 /* Updates the camera to apply the animation effects */
 void Camera::Update(double deltaTime) {
-	// Horizontal Move effect
+	// Horizontal move effect
 	if (this->mIsMovingHorizontalStep) {
 		float velocity =  this->mMoveSpeed * deltaTime;
 
@@ -145,7 +154,7 @@ void Camera::Update(double deltaTime) {
 		}
 	}
 
-	// Forward Move effect
+	// Forward move effect
 	if (this->mIsMovingForwardStep) {
 		float velocity = this->mMoveSpeed * deltaTime;
 
@@ -158,7 +167,7 @@ void Camera::Update(double deltaTime) {
 		}
 	}
 
-	// Jump effect
+	// Jump and falling effects
 	if (this->mIsJumping) {
 		float velocity = this->mJumpVelocity * deltaTime;
 
@@ -167,8 +176,8 @@ void Camera::Update(double deltaTime) {
 		this->mPosition.y += velocity;
 		this->mJumpOffset -= velocity;
 
-		if (this->mPosition.y <= this->mJumpDestination) {
-			this->mPosition.y = this->mJumpDestination;
+		if (this->mPosition.y <= this->mGroundPosition) {
+			this->mPosition.y = this->mGroundPosition;
 			this->mIsJumping = false;
 		}
 	}
@@ -205,14 +214,13 @@ void Camera::ChangeDirection(double xpos, double ypos, double deltaTime, bool co
 	this->mHorAngle += xoffset * this->mMouseSensitivity;
 	this->mVerAngle += yoffset * this->mMouseSensitivity;
 
-	/*
 	// Make sure that yaw angle is within range
 	if (constrainYaw) {
 		if (this->mHorAngle > MAX_YAW)
 			this->mHorAngle = MAX_YAW;
 		if (this->mHorAngle < MIN_YAW)
 			this->mHorAngle = MIN_YAW;
-	}*/
+	}
 
 	// Make sure that when pitch angle is out of bounds, screen doesn't get flipped
 	if (constrainPitch) {

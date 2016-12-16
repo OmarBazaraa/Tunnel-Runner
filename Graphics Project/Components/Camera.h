@@ -33,7 +33,8 @@ enum CameraAnimationType {
 	MOVE_BACKWARD,
 	MOVE_LEFT,
 	MOVE_RIGHT,
-	JUMP
+	JUMP,
+	FALL
 };
 
 
@@ -94,7 +95,7 @@ private:
 	double mJumpVelocity;
 	double mJumpAcceleration;
 	double mJumpOffset;
-	double mJumpDestination;
+	double mGroundPosition;
 	// Look around
 	double mMouseSensitivity;
 
@@ -115,6 +116,9 @@ public:
 
 	/* Destructor */
 	~Camera();
+
+	/* Sets the position of the ground/gravity, needed to apply falling effect */
+	void SetGravityPosition(double ypos);
 
 	/* Sets the Camera movement speed with a certain value */
 	void SetMoveSpeed(double speed);
@@ -137,8 +141,11 @@ public:
 	/* Applies camera view by sending the related matrices to the shader */
 	void ApplyEffects(const Shader& shader);
 
-	/* Starts a specified camera animation */
-	void StartAnimation(CameraAnimationType type, double offset);
+	/* Moves the camera a step in a certain direction */
+	void MoveStep(CameraDirection type, double offset);
+
+	/* Starts jumping animation */
+	void Jump(double offset);
 
 	/* Updates the camera to apply the animation effects */
 	void Update(double deltaTime);

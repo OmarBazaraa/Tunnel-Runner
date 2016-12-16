@@ -83,11 +83,12 @@ const string SCORE_LABEL = "Score: ";
 const string FPS_LABEL = "FPS: ";
 
 // Camera constants
-const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
+const double GRAVITY_POS = 1.0f;
 const double CAMERA_ACCELERATION = 0.01;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_SPEED_MAX = 15;
-const double JUMP_OFFSET = 1.5f;
+const double CAMERA_JUMP_OFFSET = LANE_HEIGHT * 1.5f;
+const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
 
 
 /*
@@ -118,8 +119,8 @@ private:
 	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
 	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	int mBlockId;
-	int mScore = 0;
-	GameState mGameState = RUNNING;
+	int mScore;
+	GameState mGameState;
 	bool mEscReleased = true;
 
 	// Camera
