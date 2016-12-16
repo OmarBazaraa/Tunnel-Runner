@@ -66,7 +66,7 @@ void Camera::SetPosition(glm::vec3 position) {
 
 /* Returns camera position in world's coordinates */
 glm::vec3 Camera::GetPosition() const {
-	return this->mPosition - glm::vec3(0,0,CAMERA_OFFSET);
+	return this->mPosition;
 }
 
 /* Returns camera direction in world's coordinates */
