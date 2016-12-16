@@ -60,14 +60,23 @@ void Game::Update() {
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
+
+	// Move the scene with the camera to make it feel endless
+	glm::vec3 cameraPosition = this->mCamera->GetPosition();
+	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
+	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
+
+	// Populate the game items (mGrid) to be rendered
+	GenerateSceneItems();
+
 	// Update collision
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
-	int y = int(cameraPosition.y-CAMERA_POSITION.y / LANE_SIZE);
+	int y = int(cameraPosition.y - CAMERA_POSITION.y / LANE_SIZE);
 	int x = int(cameraPosition.x / LANE_SIZE) + (LANES_X_COUNT - 1) / 2;
-	if(y>=0 && y<LANES_Y_COUNT && x>=0 && x<LANES_X_COUNT)
+	if (y >= 0 && y<LANES_Y_COUNT && x >= 0 && x<LANES_X_COUNT)
 		this->mColliding = this->mGrid[y][x].front();
-	
-	//if (mColliding == SPHERE)mIsPaused = true;
+
+
 	// Update models
 
 }
@@ -81,16 +90,8 @@ void Game::Render() {
 	this->mCamera->ApplyEffects(*mShader);
 	this->mLight->ApplyEffects(*mShader);
 
-	// Move the scene with the camera to make it feel endless
-	glm::vec3 cameraPosition = this->mCamera->GetPosition();
-	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
-	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
-
 	// Draw the scene
 	this->mScene->Draw(*this->mShader);
-
-	// Populate the game items (mGrid) to be rendered
-	GenerateSceneItems();
 
 	//Draw the block
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
@@ -289,6 +290,8 @@ void Game::GenerateSceneItems() {
 			this->mBlockId = rand() % (BLOCKS_COUNT - 2) + 2;
 
 			mBlockSliceIdx = 0;
+			// increase the speed of the camera
+			mCameraSpeed = min(CAMERA_ACCELERATION + mCameraSpeed, CAMERA_SPEED_MAX);
 		}
 
 		// fills the queue with the slice items
@@ -301,7 +304,7 @@ void Game::GenerateSceneItems() {
 	}
 				}
 
-/* Clears the grid queue from extra scenes that will not be drawn */
+/* Clears the grid queue from extra scenes that will not be seen */
 void Game::ClearGrid() {
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
 	int newZIndexPos = abs(cameraPosition.z / LANE_SIZE);

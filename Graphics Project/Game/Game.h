@@ -66,7 +66,8 @@ const string MENU_MSG = "Press ENTER to quit, ESQ to resume";
 
 // Camera constants
 const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
-const double CAMERA_ACCELERATION = 0.001;
+const double CAMERA_ACCELERATION = 0.01;
+const double CAMERA_SPEED_MAX = 15;
 const double JUMP_OFFSET = 1.5f;
 
 
