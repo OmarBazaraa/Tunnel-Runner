@@ -61,8 +61,9 @@ const double FONT_SIZE = 48.0f;
 const double FONT_MARGIN = 25.0f;
 const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 
-// Menu constants
+// Strings and messages
 const string MENU_MSG = "Press ENTER to quit, ESQ to resume";
+const string GAME_OVER_MSG = "Game Over";
 
 // Camera constants
 const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
