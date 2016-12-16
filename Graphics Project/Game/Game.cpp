@@ -14,7 +14,7 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitTextRenderers();
 
 	ResetGame();
-	mColliding.Down = EMPTY;
+
 	mColliding.Right = EMPTY;
 	mColliding.Left = EMPTY;
 }
@@ -77,44 +77,43 @@ void Game::Update() {
 	// Populate the game items (mGrid) to be rendered
 	GenerateSceneItems();
 
-	this->mColliding = Collide(this->mCamera->GetPosition() - CAMERA_POSITION);
+	Collide(this->mCamera->GetPosition() - CAMERA_POSITION);
 
 
 	// Update models
 
 }
 
-Borders Game::Collide(glm::vec3 character) {
-	Borders ret;
+void Game::Collide(glm::vec3 character) {
 	GameItem colliding;
-	ret.Down = ret.Left = ret.Right = EMPTY;
+	mColliding.Left = mColliding.Right = EMPTY;
 	int x = character.x / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
 	int y = character.y / LANE_HEIGHT;
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT) {
 		colliding = this->mGrid[y][x].front();
 
-		if (y == 0)ret.Down = BLOCK;
-		else ret.Down = this->mGrid[y - 1][x].front();
+		if (x == 0)mColliding.Left = BLOCK;
+		else  mColliding.Left = this->mGrid[y][x - 1].front();
 
+		if (x + 1 == LANES_X_COUNT)mColliding.Right = BLOCK;
+		else mColliding.Right = this->mGrid[y][x + 1].front();
 
-		if (x == 0)ret.Left = BLOCK;
-		else  ret.Left = this->mGrid[y][x - 1].front();
-
-		if (x + 1 == LANES_X_COUNT)ret.Right = BLOCK;
-		else ret.Right = this->mGrid[y][x + 1].front();
-
-		if (ret.Down == BLOCK)this->mCamera->SetGravityPosition((y+1)*LANE_HEIGHT);
+		for (int i = y; i >= 0; --i)
+			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
+				this->mCamera->SetGravityPosition((i + 1)*LANE_HEIGHT);
+				break;
+			}
+		
+		
 
 		if (colliding == COIN) {
 			mScore++;
 			this->mGrid[y][x].front() = EMPTY;
 		}
 		else if (colliding == BLOCK) {
-			ResetGame();
+			this->mGameState = LOST;
 		}
-
 	}
-	return ret;
 }
 /* Renders the new frame */
 void Game::Render() {

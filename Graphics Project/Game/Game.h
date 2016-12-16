@@ -50,7 +50,7 @@ enum GameState {
 
 
 struct Borders {
-	GameItem Right, Left, Down;
+	GameItem Right, Left;
 };
 
 
@@ -156,7 +156,7 @@ public:
 private:
 
 	/* Gets the colliding item with the character */
-	Borders Collide(glm::vec3 character);
+	void Collide(glm::vec3 character);
 
 
 	/* Renders the text of the game */
