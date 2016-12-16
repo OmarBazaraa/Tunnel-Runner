@@ -69,8 +69,12 @@ void Game::Update() {
 	GenerateSceneItems();
 
 	// Update collision
-	//this->mColliding = this->mGrid[int(cameraPosition.y/LANES_Y_COUNT/LANE_SIZE)][int(cameraPosition.x / LANES_X_COUNT / LANE_SIZE)].front();
-	
+	int y = int((cameraPosition.y - CAMERA_POSITION.y) / LANE_SIZE);
+	int x = int((cameraPosition.x - CAMERA_POSITION.x) / LANE_SIZE) + (LANES_X_COUNT - 1) / 2;
+	if (y >= 0 && y<LANES_Y_COUNT && x >= 0 && x<LANES_X_COUNT)
+		this->mColliding = this->mGrid[y][x].front();
+
+
 	// Update models
 
 }
@@ -152,8 +156,13 @@ void Game::Render() {
 
 /* Processes inputs from keyboard */
 void Game::ProcessKeyInput() {
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS && this->mEscReleased) {
 		this->mIsPaused = !this->mIsPaused;
+		this->mEscReleased = false;
+	}
+
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_RELEASE) {
+		this->mEscReleased = true;
 	}
 
 	if (this->mIsPaused) {
@@ -311,7 +320,7 @@ void Game::GenerateSceneItems() {
 		}
 		mBlockSliceIdx++;
 	}
-}
+				}
 
 /* Clears the grid queue from extra scenes that will not be seen */
 void Game::ClearGrid() {
