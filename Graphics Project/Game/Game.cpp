@@ -267,13 +267,12 @@ void Game::ResetGame() {
 	this->mCamera->SetPosition(CAMERA_POSITION);
 	this->mBlockSliceIdx = 0;
 	this->mBlockId = 0;
-	for (int x = 0; x < LANES_X_COUNT; ++x) {
-		for (int y = 0; y < LANES_Y_COUNT; ++y) {
-			while (!mGrid[x][y].empty())
-				this->mGrid[x][y].pop();
+	for (int y = 0; y < LANES_Y_COUNT; ++y) {
+		for (int x = 0; x < LANES_X_COUNT; ++x) {
+			while (!mGrid[y][x].empty())
+				this->mGrid[y][x].pop();
 		}
 	}
-	std::cout << mGrid[0][0].size() << endl;
 }
 
 /* Initializes the game sounds and background music */
@@ -348,6 +347,8 @@ void Game::InitGameBlocks() {
 			}
 		}
 	}
+
+	in.close();
 }
 
 /* Initializes the game text renderers */
@@ -362,37 +363,40 @@ void Game::GenerateSceneItems() {
 	//remove from the grid all of the hidden slices
 	ClearGrid();
 
-	while (mGrid[0][0].size() < LANES_Z_COUNT) {
+	while (this->mGrid[0][0].size() < LANES_Z_COUNT) {
 
 		// if the block is entirely put into the queue then we need to get a new one
 		if (mBlockSliceIdx == LANES_Z_COUNT) {
 			// Randomlly gets the game item block
 			this->mBlockId = rand() % (BLOCKS_COUNT - 1) + 1;
 
-			mBlockSliceIdx = 0;
+			this->mBlockSliceIdx = 0;
 			// increase the speed of the camera
-			mCameraSpeed = min(CAMERA_ACCELERATION + mCameraSpeed, CAMERA_SPEED_MAX);
+			this->mCameraSpeed = min(CAMERA_ACCELERATION + mCameraSpeed, CAMERA_SPEED_MAX);
 		}
 
 		// fills the queue with the slice items
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+				this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
 			}
 		}
-		mBlockSliceIdx++;
+		this->mBlockSliceIdx++;
 	}
 }
 
 /* Clears the grid queue from extra scenes that will not be seen */
 void Game::ClearGrid() {
+	if (this->mGrid[0][0].empty())
+		return;
+
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
 	int newZIndexPos = abs(cameraPosition.z / LANE_DEPTH);
-	if (newZIndexPos > mZGridIndex) {
-		mZGridIndex = newZIndexPos;
+	if (newZIndexPos > this->mZGridIndex) {
+		this->mZGridIndex = newZIndexPos;
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				mGrid[y][x].pop();
+				this->mGrid[y][x].pop();
 			}
 		}
 		// moves the Z porition of the camera back to it's initial position
