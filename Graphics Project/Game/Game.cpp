@@ -285,6 +285,8 @@ void Game::GenerateSceneItems() {
 			this->mBlockId = rand() % (BLOCKS_COUNT - 2) + 2;
 
 			mBlockSliceIdx = 0;
+			// increase the speed of the camera
+			mCameraSpeed = min(CAMERA_ACCELERATION + mCameraSpeed, CAMERA_SPEED_MAX);
 		}
 
 		// fills the queue with the slice items
@@ -295,9 +297,9 @@ void Game::GenerateSceneItems() {
 		}
 		mBlockSliceIdx++;
 	}
-				}
+}
 
-/* Clears the grid queue from extra scenes that will not be drawn */
+/* Clears the grid queue from extra scenes that will not be seen */
 void Game::ClearGrid() {
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
 	int newZIndexPos = abs(cameraPosition.z / LANE_SIZE);
