@@ -81,14 +81,14 @@ private:
 	// Animation variables
 	// Move
 	bool mIsMovingHorizontalStep;
-	bool mIsMovingVerticalStep;
+	bool mIsMovingForwardStep;
 	double mMoveSpeed;
 	double mMoveHorizontalDirection;
-	double mMoveVerticalDirection;
+	double mMoveForwardDirection;
 	double mMoveHorizontalOffset;
-	double mMoveVerticalOffset;
+	double mMoveForwardOffset;
 	double mMoveHorizontalDestination;
-	double mMoveVerticalDestination;
+	double mMoveForwardDestination;
 	// Jump
 	bool mIsJumping;
 	double mJumpVelocity;
@@ -115,6 +115,12 @@ public:
 
 	/* Destructor */
 	~Camera();
+
+	/* Sets the Camera movement speed with a certain value */
+	void SetMoveSpeed(double speed);
+
+	/* Sets the position of the camera by the given vector */
+	void SetPosition(glm::vec3 position = POSITION);
 
 	/* Returns camera position in world's coordinates */
 	glm::vec3 GetPosition() const;
@@ -145,12 +151,6 @@ public:
 
 	/* Changes the zoom effect of the camera by a certain offset */
 	void Zoom(double offset);
-
-	/* Sets the Camera movement speed with a certain value */
-	void SetMoveSpeed(double speed);
-
-	/* Sets the position of the camera by the given vector */
-	void SetPosition(glm::vec3 position = POSITION);
 
 private:
 	/* Calculates the front vector from the camera's (updated) Eular Angles */

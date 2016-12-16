@@ -108,6 +108,7 @@ private:
 
 	// Menu variables
 	bool mIsPaused = false;
+	bool mEscReleased = true;
 
 	// Camera
 	double mCameraSpeed = 4;

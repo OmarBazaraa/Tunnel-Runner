@@ -153,8 +153,13 @@ void Game::Render() {
 
 /* Processes inputs from keyboard */
 void Game::ProcessKeyInput() {
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS && this->mEscReleased) {
 		this->mIsPaused = !this->mIsPaused;
+		this->mEscReleased = false;
+	}
+
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_RELEASE) {
+		this->mEscReleased = true;
 	}
 
 	if (this->mIsPaused) {

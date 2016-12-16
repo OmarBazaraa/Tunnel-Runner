@@ -14,7 +14,7 @@ Camera::Camera(glm::vec3 position, double aspect) {
 	// Animation variables
 	// Horizontal Move
 	this->mIsMovingHorizontalStep = false;
-	this->mIsMovingVerticalStep = false;
+	this->mIsMovingForwardStep = false;
 	this->mMoveSpeed = MOVE_SPEED;
 	// Jump
 	this->mIsJumping = false;
@@ -41,6 +41,16 @@ Camera::Camera(glm::vec3 position, double aspect) {
 /* Destructor */
 Camera::~Camera() {
 	
+}
+
+/* Sets the movement speed of the camera */
+void Camera::SetMoveSpeed(double speed) {
+	this->mMoveSpeed = speed;
+}
+
+/* Sets the position of the camera in world space */
+void Camera::SetPosition(glm::vec3 position) {
+	this->mPosition = position;
 }
 
 /* Returns camera position in world's coordinates */
@@ -75,19 +85,19 @@ void Camera::StartAnimation(CameraAnimationType type, double offset) {
 	switch (type)
 	{
 	case MOVE_FORWARD:
-		if (!this->mIsMovingVerticalStep) {
-			this->mIsMovingVerticalStep = true;
-			this->mMoveVerticalDirection = -1.0;
-			this->mMoveVerticalOffset = offset;
-			this->mMoveVerticalDestination = this->mPosition.z - offset;
+		if (!this->mIsMovingForwardStep) {
+			this->mIsMovingForwardStep = true;
+			this->mMoveForwardDirection = -1.0;
+			this->mMoveForwardOffset = offset;
+			this->mMoveForwardDestination = this->mPosition.z - offset;
 		}
 		break;
 	case MOVE_BACKWARD:
-		if (!this->mIsMovingVerticalStep) {
-			this->mIsMovingVerticalStep = true;
-			this->mMoveVerticalDirection = 1.0;
-			this->mMoveVerticalOffset = offset;
-			this->mMoveVerticalDestination = this->mPosition.z + offset;
+		if (!this->mIsMovingForwardStep) {
+			this->mIsMovingForwardStep = true;
+			this->mMoveForwardDirection = 1.0;
+			this->mMoveForwardOffset = offset;
+			this->mMoveForwardDestination = this->mPosition.z + offset;
 		}
 		break;
 	case MOVE_LEFT:
@@ -135,16 +145,16 @@ void Camera::Update(double deltaTime) {
 		}
 	}
 
-	// Vertical Move effect
-	if (this->mIsMovingVerticalStep) {
+	// Forward Move effect
+	if (this->mIsMovingForwardStep) {
 		float velocity = this->mMoveSpeed * deltaTime;
 
-		this->mPosition.z += velocity * this->mMoveVerticalDirection;
-		this->mMoveVerticalOffset -= velocity;
+		this->mPosition.z += velocity * this->mMoveForwardDirection;
+		this->mMoveForwardOffset -= velocity;
 
-		if (this->mMoveVerticalOffset <= 0.0f) {
-			this->mPosition.z = this->mMoveVerticalDestination;
-			this->mIsMovingVerticalStep = false;
+		if (this->mMoveForwardOffset <= 0.0f) {
+			this->mPosition.z = this->mMoveForwardDestination;
+			this->mIsMovingForwardStep = false;
 		}
 	}
 
@@ -194,6 +204,7 @@ void Camera::ChangeDirection(double xpos, double ypos, double deltaTime, bool co
 
 	this->mHorAngle += xoffset * this->mMouseSensitivity;
 	this->mVerAngle += yoffset * this->mMouseSensitivity;
+
 	/*
 	// Make sure that yaw angle is within range
 	if (constrainYaw) {
@@ -223,14 +234,6 @@ void Camera::Zoom(double offset) {
 		this->mFOV = MIN_FOV;
 	if (this->mFOV >= MAX_FOV)
 		this->mFOV = MAX_FOV;
-}
-
-void Camera::SetMoveSpeed(double speed) {
-	this->mMoveSpeed = speed;
-}
-
-void Camera::SetPosition(glm::vec3 position) {
-	this->mPosition = position;
 }
 
 /* Calculates the front vector from the camera's (updated) Eular Angles */
