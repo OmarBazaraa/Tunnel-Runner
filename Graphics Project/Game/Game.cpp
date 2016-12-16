@@ -62,8 +62,12 @@ void Game::Update() {
 
 	// Update collision
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
-	this->mColliding = this->mGrid[int(cameraPosition.y/LANES_Y_COUNT/LANE_SIZE)][int(cameraPosition.x / LANES_X_COUNT / LANE_SIZE)].front();
+	int y = int(cameraPosition.y-CAMERA_POSITION.y / LANE_SIZE);
+	int x = int(cameraPosition.x / LANE_SIZE) + (LANES_X_COUNT - 1) / 2;
+	if(y>=0 && y<LANES_Y_COUNT && x>=0 && x<LANES_X_COUNT)
+		this->mColliding = this->mGrid[y][x].front();
 	
+	//if (mColliding == SPHERE)mIsPaused = true;
 	// Update models
 
 }
