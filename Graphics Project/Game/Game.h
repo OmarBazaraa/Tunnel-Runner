@@ -38,6 +38,15 @@ enum GameItem {
 	ITEMS_COUNT
 };
 
+/*
+	Defines several game states
+*/
+enum GameState {
+	RUNNING,
+	PAUSED,
+	LOST
+};
+
 // Forward class declaration
 class GameEngine;
 
@@ -47,8 +56,8 @@ const int LANES_Y_COUNT = 4;
 const int LANES_Z_COUNT = 20;
 const int BLOCKS_COUNT = 5;
 const double LANE_WIDTH = 1.5f;
-const double LANE_DEPTH = 1.5f;
 const double LANE_HEIGHT = 1.0f;
+const double LANE_DEPTH = 1.5f;
 const double SCENE_WIDTH = LANES_X_COUNT * LANE_WIDTH;
 const double SCENE_HEIGHT = LANES_Y_COUNT * LANE_HEIGHT;
 const double SCENE_DEPTH = LANES_Z_COUNT * LANE_DEPTH;
@@ -63,10 +72,15 @@ const double RING_DEPTH = 0.2;
 // Font constants
 const double FONT_SIZE = 48.0f;
 const double FONT_MARGIN = 25.0f;
+const double FONT_SCALE = 1.0f;
+const double MENU_FONT_SCALE = 0.6f;
 const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 
 // Menu constants
-const string MENU_MSG = "Press ENTER to quit, ESQ to resume";
+const string MENU_MSG = "Press Q to quit, R to replay";
+const string GAME_OVER_MSG = "Game Over";
+const string SCORE_LABEL = "Score: ";
+const string FPS_LABEL = "FPS: ";
 
 // Camera constants
 const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -81,26 +95,21 @@ const double JUMP_OFFSET = 1.5f;
 class Game
 {
 private:
-	// Game engine
+	// Engines
 	GameEngine* mEngine;
-
-	// Sound engine
 	ISoundEngine* mSoundEngine;
 
 	// Shaders
 	Shader* mShader;
 	Shader* mTextShader;
-
 	// Models
 	Model* mScene;
 	Model* mSphere;
 	Model* mCoin;
 	Model* mCube;
 	Model* mRing;
-
 	// Light sources
 	LightSource* mLight;
-
 	// Text renderers
 	TextRenderer* mTextRenderer;
 
@@ -109,9 +118,7 @@ private:
 	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	int mBlockId;
 	int mScore = 0;
-
-	// Menu variables
-	bool mIsPaused = false;
+	GameState mGameState = RUNNING;
 	bool mEscReleased = true;
 
 	// Camera
@@ -137,6 +144,9 @@ public:
 	void Render();
 
 private:
+	/* Renders the text of the game */
+	void RenderText();
+
 	/* Processes inputs from keyboard */
 	void ProcessKeyInput();
 
@@ -145,6 +155,9 @@ private:
 
 	/* Processes inputs from mouse */
 	void ProcessMouseInput();
+
+	/* Resets the game initial values */
+	void ResetGame();
 
 	/* Initializes the game sounds and background music */
 	void InitSounds();

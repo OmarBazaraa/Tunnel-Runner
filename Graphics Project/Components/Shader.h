@@ -87,7 +87,7 @@ public:
 	~Shader();
 
 	/* Activates the current shader */
-	void Use();
+	void Use() const;
 
 private:
 	/* Setup shader's attribute and uniform locations */

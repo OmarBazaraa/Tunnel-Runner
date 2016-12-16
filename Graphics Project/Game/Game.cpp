@@ -12,6 +12,8 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitModels();
 	InitLightSources();
 	InitTextRenderers();
+
+	ResetGame();
 }
 
 /* Destructs the game and free resources */
@@ -48,7 +50,7 @@ void Game::ProcessInput() {
 
 /* Updates objects' information needed to apply effects on the next frame  */
 void Game::Update() {
-	if (this->mIsPaused) {
+	if (this->mGameState != RUNNING) {
 		return;
 	}
 
@@ -81,9 +83,6 @@ void Game::Update() {
 
 /* Renders the new frame */
 void Game::Render() {
-	//
-	// Draw Models
-	//
 	this->mShader->Use();
 	this->mCamera->ApplyEffects(*mShader);
 	this->mLight->ApplyEffects(*mShader);
@@ -91,7 +90,7 @@ void Game::Render() {
 	// Draw the scene
 	this->mScene->Draw(*this->mShader);
 
-	//Draw the block
+	// Draw the block
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
 		for (int x = 0; x < LANES_X_COUNT; ++x) {
 			for (int z = 0; z < this->mGrid[y][x].size(); ++z) {
@@ -128,44 +127,84 @@ void Game::Render() {
 			}
 		}
 	}
-	//----------------------------------------------
+	
+	this->RenderText();
+}
 
+/* Renders the text of the game */
+void Game::RenderText() {
 	//
-	// Draw Text
+	// Draw Score and FPS
 	//
-	stringstream ss;
-	ss << "Score: " << this->mScore;
 	int w, h;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
-	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), FONT_MARGIN, h - FONT_MARGIN - FONT_SIZE, 1.0f, FONT_COLOR);
+
+	stringstream ss;
+	ss << SCORE_LABEL << this->mScore;
+	this->mTextRenderer->RenderText(
+		*this->mTextShader,
+		ss.str(),
+		FONT_MARGIN,
+		h - FONT_MARGIN - FONT_SIZE,
+		FONT_SCALE,
+		FONT_COLOR
+	);
 
 	ss.clear();
 	ss.str("");
-	ss << "FPS: " << this->mEngine->mTimer->FPS;
-	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), FONT_MARGIN, FONT_MARGIN, 1.0f, FONT_COLOR);
+	ss << FPS_LABEL << this->mEngine->mTimer->FPS;
+	this->mTextRenderer->RenderText(
+		*this->mTextShader,
+		ss.str(),
+		FONT_MARGIN,
+		FONT_MARGIN,
+		FONT_SCALE,
+		FONT_COLOR
+	);
 	//----------------------------------------------
 
 	//
 	// Draw Menu
 	//
-	if (this->mIsPaused) {
-		this->mTextRenderer->RenderText(*this->mTextShader, MENU_MSG, w / 2 - MENU_MSG.size() / 4 * FONT_SIZE * 0.5, h / 2 - FONT_SIZE * 0.5, 0.5f, FONT_COLOR);
+	if (this->mGameState == LOST) {
+		int width = this->mTextRenderer->GetTextWidth(GAME_OVER_MSG, MENU_FONT_SCALE);
+
+		this->mTextRenderer->RenderText(
+			*this->mTextShader,
+			GAME_OVER_MSG,
+			(w - width) / 2,
+			h / 2 - FONT_SIZE * MENU_FONT_SCALE + FONT_MARGIN * 2,
+			MENU_FONT_SCALE,
+			FONT_COLOR
+		);
 	}
-	//----------------------------------------------
+
+	if (this->mGameState != RUNNING) {
+		int width = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
+
+		this->mTextRenderer->RenderText(
+			*this->mTextShader,
+			MENU_MSG,
+			(w - width) / 2,
+			h / 2 - FONT_SIZE * MENU_FONT_SCALE,
+			MENU_FONT_SCALE,
+			FONT_COLOR
+		);
+	}
 }
 
 /* Processes inputs from keyboard */
 void Game::ProcessKeyInput() {
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS && this->mEscReleased) {
-		this->mIsPaused = !this->mIsPaused;
-		this->mEscReleased = false;
-	}
-
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_RELEASE) {
 		this->mEscReleased = true;
 	}
 
-	if (this->mIsPaused) {
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_PRESS && this->mEscReleased && this->mGameState != LOST) {
+		this->mGameState = (this->mGameState == PAUSED) ? RUNNING : PAUSED;
+		this->mEscReleased = false;
+	}
+
+	if (this->mGameState != RUNNING) {
 		this->ProcessMenuInput();
 		return;
 	}
@@ -199,19 +238,29 @@ void Game::ProcessKeyInput() {
 
 /* Processes inputs for the game menu while the game is paused */
 void Game::ProcessMenuInput() {
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ENTER) == GLFW_PRESS)
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_Q) == GLFW_PRESS)
 		glfwSetWindowShouldClose(this->mEngine->mWind, GL_TRUE);
+
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_R) == GLFW_PRESS)
+		this->ResetGame();
 }
 
 /* Processes inputs from mouse */
 void Game::ProcessMouseInput() {
-	if (this->mIsPaused) {
+	if (this->mGameState != RUNNING) {
 		return;
 	}
 
 	double xpos, ypos;
 	glfwGetCursorPos(this->mEngine->mWind, &xpos, &ypos);
 	this->mCamera->ChangeDirection(xpos, ypos, this->mEngine->mTimer->ElapsedFramesTime);
+}
+
+/* Resets the game initial values */
+void Game::ResetGame() {
+	// TODO: Set game intial values here
+	this->mScore = 0;
+	this->mGameState = RUNNING;
 }
 
 /* Initializes the game sounds and background music */
