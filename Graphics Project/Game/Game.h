@@ -47,6 +47,14 @@ enum GameState {
 	LOST
 };
 
+
+
+struct Borders {
+	GameItem Right, Left, Down;
+};
+
+
+
 // Forward class declaration
 class GameEngine;
 
@@ -127,7 +135,7 @@ private:
 	double mCameraSpeed = CAMERA_SPEED_INIT;
 	int mZGridIndex = 0, mBlockSliceIdx = 0;
 	Camera* mCamera;
-	GameItem mColliding;
+	Borders mColliding;
 	
 public:
 	/* Constructs a new game with all related objects and components */
@@ -146,6 +154,11 @@ public:
 	void Render();
 
 private:
+
+	/* Gets the colliding item with the character */
+	Borders Collide(glm::vec3 character);
+
+
 	/* Renders the text of the game */
 	void RenderText();
 

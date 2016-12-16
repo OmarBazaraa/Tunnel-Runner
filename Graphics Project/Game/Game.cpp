@@ -14,6 +14,9 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitTextRenderers();
 
 	ResetGame();
+	mColliding.Down = EMPTY;
+	mColliding.Right = EMPTY;
+	mColliding.Left = EMPTY;
 }
 
 /* Destructs the game and free resources */
@@ -74,21 +77,45 @@ void Game::Update() {
 	// Populate the game items (mGrid) to be rendered
 	GenerateSceneItems();
 
-	// Update collision
-	int y = int((cameraPosition.y - CAMERA_POSITION.y) / LANE_HEIGHT);
-	int x = int((cameraPosition.x - CAMERA_POSITION.x) / LANE_WIDTH) + (LANES_X_COUNT - 1) / 2;
-	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT) {
-		this->mColliding = this->mGrid[y][x].front();
+	this->mColliding = Collide(this->mCamera->GetPosition() - CAMERA_POSITION);
 
-		if (mColliding == COIN) {
+
+	// Update models
+
+}
+
+Borders Game::Collide(glm::vec3 character) {
+	Borders ret;
+	GameItem colliding;
+	ret.Down = ret.Left = ret.Right = EMPTY;
+	int x = character.x / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
+	int y = character.y / LANE_HEIGHT;
+	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT) {
+		colliding = this->mGrid[y][x].front();
+
+		if (y == 0)ret.Down = BLOCK;
+		else ret.Down = this->mGrid[y - 1][x].front();
+
+
+		if (x == 0)ret.Left = BLOCK;
+		else  ret.Left = this->mGrid[y][x - 1].front();
+
+		if (x + 1 == LANES_X_COUNT)ret.Right = BLOCK;
+		else ret.Right = this->mGrid[y][x + 1].front();
+
+		if (ret.Down == BLOCK)this->mCamera->SetGravityPosition((y+1)*LANE_HEIGHT);
+
+		if (colliding == COIN) {
 			mScore++;
 			this->mGrid[y][x].front() = EMPTY;
 		}
+		else if (colliding == BLOCK) {
+			ResetGame();
+		}
+
 	}
-
-	// Update models
+	return ret;
 }
-
 /* Renders the new frame */
 void Game::Render() {
 	// Apply effect to the shader
@@ -216,12 +243,13 @@ void Game::ProcessKeyInput() {
 		return;
 	}
 
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
+	if (mColliding.Left != BLOCK && glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS)
 		this->mCamera->MoveStep(LEFT, LANE_WIDTH);
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
+	if (mColliding.Right != BLOCK && glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS)
 		this->mCamera->MoveStep(RIGHT, LANE_WIDTH);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS)
 		this->mCamera->Jump(CAMERA_JUMP_OFFSET);
+
 }
 
 /* Processes inputs for the game menu while the game is paused */
