@@ -97,6 +97,7 @@ private:
 	double mCameraSpeed = 4;
 	int mZGridIndex = 0, mBlockSliceIdx = 0;
 	Camera* mCamera;
+	GameItem mColliding;
 	
 public:
 	/* Constructs a new game with all related objects and components */

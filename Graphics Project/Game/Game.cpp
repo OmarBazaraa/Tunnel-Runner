@@ -53,6 +53,10 @@ void Game::Update() {
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
+	// Update collision
+	glm::vec3 cameraPosition = this->mCamera->GetPosition();
+	this->mColliding = this->mGrid[int(cameraPosition.y/LANES_Y_COUNT/LANE_SIZE)][int(cameraPosition.x / LANES_X_COUNT / LANE_SIZE)].front();
+	
 	// Update models
 
 
