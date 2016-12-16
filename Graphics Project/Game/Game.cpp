@@ -74,10 +74,11 @@ void Game::Update() {
 	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
+	Collide(this->mCamera->GetPosition() - CAMERA_POSITION);
+	
 	// Populate the game items (mGrid) to be rendered
 	GenerateSceneItems();
 
-	Collide(this->mCamera->GetPosition() - CAMERA_POSITION);
 
 
 	// Update models
