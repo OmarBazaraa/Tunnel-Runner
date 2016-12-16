@@ -70,8 +70,8 @@ void Game::Update() {
 	GenerateSceneItems();
 
 	// Update collision
-	int y = int(cameraPosition.y - CAMERA_POSITION.y / LANE_SIZE);
-	int x = int(cameraPosition.x - CAMERA_POSITION.x / LANE_SIZE) + (LANES_X_COUNT - 1) / 2;
+	int y = int((cameraPosition.y - CAMERA_POSITION.y) / LANE_SIZE);
+	int x = int((cameraPosition.x - CAMERA_POSITION.x) / LANE_SIZE) + (LANES_X_COUNT - 1) / 2;
 	if (y >= 0 && y<LANES_Y_COUNT && x >= 0 && x<LANES_X_COUNT)
 		this->mColliding = this->mGrid[y][x].front();
 
