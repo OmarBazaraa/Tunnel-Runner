@@ -265,7 +265,7 @@ void Game::InitGameBlocks() {
 void Game::InitTextRenderers() {
 	int w, h;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
-	this->mTextRenderer = new TextRenderer("Fonts/segoeui.ttf", 48, w, h);
+	this->mTextRenderer = new TextRenderer("Fonts/dizzyedge.otf", FONT_SIZE, w, h);
 }
 
 /* Generates all of the scene items */
