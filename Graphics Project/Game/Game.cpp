@@ -60,9 +60,17 @@ void Game::Update() {
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
-	// Update collision
+
+	// Move the scene with the camera to make it feel endless
 	glm::vec3 cameraPosition = this->mCamera->GetPosition();
-	this->mColliding = this->mGrid[int(cameraPosition.y/LANES_Y_COUNT/LANE_SIZE)][int(cameraPosition.x / LANES_X_COUNT / LANE_SIZE)].front();
+	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
+	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
+
+	// Populate the game items (mGrid) to be rendered
+	GenerateSceneItems();
+
+	// Update collision
+	//this->mColliding = this->mGrid[int(cameraPosition.y/LANES_Y_COUNT/LANE_SIZE)][int(cameraPosition.x / LANES_X_COUNT / LANE_SIZE)].front();
 	
 	// Update models
 
@@ -77,16 +85,8 @@ void Game::Render() {
 	this->mCamera->ApplyEffects(*mShader);
 	this->mLight->ApplyEffects(*mShader);
 
-	// Move the scene with the camera to make it feel endless
-	glm::vec3 cameraPosition = this->mCamera->GetPosition();
-	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
-	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
-
 	// Draw the scene
 	this->mScene->Draw(*this->mShader);
-
-	// Populate the game items (mGrid) to be rendered
-	GenerateSceneItems();
 
 	//Draw the block
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
