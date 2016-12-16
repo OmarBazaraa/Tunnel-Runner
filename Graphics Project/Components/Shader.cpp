@@ -88,7 +88,7 @@ Shader::~Shader() {
 }
 
 /* Activates the current shader */
-void Shader::Use() {
+void Shader::Use() const {
 	glUseProgram(this->ProgramID);
 }
 

@@ -105,7 +105,7 @@ TextRenderer::~TextRenderer() {
 }
 
 /* Draws the given text starting from (x, y) with the specified scale and color  */
-void TextRenderer::RenderText(Shader &shader, string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
+void TextRenderer::RenderText(const Shader &shader, const string& text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
 	shader.Use();
 	glUniformMatrix4fv(shader.ProjectionMatrixLoc, 1, GL_FALSE, glm::value_ptr(mProjectionMatrix));
 	glUniform3f(shader.TextColorLoc, color.x, color.y, color.z);
@@ -153,4 +153,18 @@ void TextRenderer::RenderText(Shader &shader, string text, GLfloat x, GLfloat y,
 	// Unbing VAO/Texture
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+/* Returns the width of the given text */
+GLfloat TextRenderer::GetTextWidth(const string& text, GLfloat scale) const {
+	GLfloat width = 0;
+
+	// Iterate through all characters
+	for (unsigned int i = 0; i < text.size(); ++i) {
+		width += this->mCharacters[text[i]].Advance;
+	}
+
+	width -= (this->mCharacters[text.back()].Advance - this->mCharacters[text.back()].Width);
+
+	return width * scale;
 }

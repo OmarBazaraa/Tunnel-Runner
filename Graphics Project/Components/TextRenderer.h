@@ -54,5 +54,8 @@ public:
 	~TextRenderer();
 
 	/* Draws the given text starting from (x, y) with the specified scale and color  */
-	void RenderText(Shader &shader, string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);
+	void RenderText(const Shader &shader, const string& text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);
+
+	/* Returns the width of the given text */
+	GLfloat GetTextWidth(const string& text, GLfloat scale) const;
 };
