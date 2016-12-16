@@ -13,6 +13,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{88fa0291-2fc8-4254-848c-a4b9603733c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Levels">
+      <UniqueIdentifier>{df08ba56-0651-41c8-905d-7420dcde60d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
@@ -92,5 +95,10 @@
     <None Include="Shaders\text_vertex.shader">
       <Filter>Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Levels\Level.txt">
+      <Filter>Levels</Filter>
+    </Text>
   </ItemGroup>
 </Project>
