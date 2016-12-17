@@ -92,6 +92,7 @@ const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
 
 // Game constants
+const int COIN_VALUE = 1;
 const double DOUBLE_SCORE_DURATION = 10.0f;
 
 
@@ -134,12 +135,12 @@ private:
 	// Game properties and variables
 	GameState mGameState;
 	int mScore;
-	int mCoinValue = 1;
-	int mGameStartTime;
+	int mCoinValue;
+	double mGameTime;
 	double mDoubleScoreTime;
-	bool mEscReleased = true, mDoubleScore;
-	float mColorValue = 0.0f;
-
+	bool mDoubleScore;
+	bool mEscReleased = true;
+	
 public:
 	/* Constructs a new game with all related objects and components */
 	Game(GameEngine* engine, const char* title);

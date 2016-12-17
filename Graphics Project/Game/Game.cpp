@@ -56,10 +56,14 @@ void Game::Update() {
 	if (this->mGameState != RUNNING)
 		return;
 
-	// Removes the double score effect after ceratin amount of time
+	// Update runnning game time
+	this->mGameTime += this->mEngine->mTimer->ElapsedFramesTime;
+
+	// Removes the double score effect after certain amount of time
 	if (this->mDoubleScore) {
 		this->mDoubleScoreTime += this->mEngine->mTimer->ElapsedFramesTime;
-		if (mDoubleScoreTime >= DOUBLE_SCORE_DURATION) {
+
+		if (this->mDoubleScoreTime >= DOUBLE_SCORE_DURATION) {
 			this->mDoubleScore = false;
 			this->mCoinValue /= 2;
 		}
@@ -70,18 +74,13 @@ void Game::Update() {
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 
 	// Update light sources
-	/*
-	this->mColorValue += 0.005f;
-	if (this->mColorValue > 2.5f) {
-		this->mColorValue = 0;
-	}
-	double r = abs(sin(this->mColorValue) / 2.0f) + 0.5f;
-	double g = abs(cos(this->mColorValue) / 2.0f) + 0.5f;
-	double b = abs(tan(this->mColorValue) / 2.0f) + 0.5f;
+	double r = abs(sin(this->mGameTime) / 2.0f) + 0.5f;
+	double g = abs(cos(this->mGameTime) / 2.0f) + 0.5f;
+	double b = 1.0f;// abs(tan(this->mGameTime) / 2.0f) + 0.5f;
 	this->mLight->SpecularColor = glm::vec3(r, g, b);
 	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
 	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
-	*/
+	
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
@@ -157,7 +156,7 @@ void Game::RenderText() {
 	// Time
 	ss.clear();
 	ss.str("");
-	ss << TIME_LABEL << (int)this->mEngine->mTimer->CurrentFrameTime - this->mGameStartTime;
+	ss << TIME_LABEL << (int)this->mGameTime;
 	x = w - FONT_MARGIN * 8;
 	y = h - FONT_MARGIN - FONT_SIZE;
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
@@ -257,10 +256,10 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 
 	// Set gravity position
 	for (int i = y; i >= 0; --i) {
-			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
+		if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
 			this->mCamera->SetGravityPosition(i * LANE_HEIGHT + GRAVITY_POS);
-				break;
-			}
+			break;
+		}
 	}
 
 	// Detected collision
@@ -269,16 +268,16 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		this->mGrid[y][x].front() = EMPTY;
 	}
 
-		/*for (int z = 1; z < LANES_Z_COUNT; z++) {
-			for (int y = 0; y < LANES_Y_COUNT; y++) {
-				for (int x = 0; x < LANES_X_COUNT; x++) {
-					GameItem front = this->mGrid[y][x].front();
-					this->mGrid[y][x].pop();
-					this->mGrid[y][x].push(front);
-				}
-			}
-		}*/
+	/*for (int z = 1; z < LANES_Z_COUNT; z++) {
+	for (int y = 0; y < LANES_Y_COUNT; y++) {
+	for (int x = 0; x < LANES_X_COUNT; x++) {
+	GameItem front = this->mGrid[y][x].front();
+	this->mGrid[y][x].pop();
+	this->mGrid[y][x].push(front);
 	}
+	}
+	}*/
+}
 
 /* Executes actions according to different types of collision with game items */
 void Game::Collide(GameItem item) {
@@ -296,9 +295,9 @@ void Game::Collide(GameItem item) {
 		if (!mDoubleScore) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
-	}
+		}
 		break;
-}
+	}
 }
 
 /* Generates all of the scene items */
@@ -307,7 +306,7 @@ void Game::GenerateSceneItems() {
 	ClearGrid();
 
 	while (this->mGrid[0][0].size() < LANES_Z_COUNT) {
-		// if we consumed the whole block then get a new one
+		// If we consumed the whole block then get a new one
 		if (mBlockSliceIdx >= LANES_Z_COUNT) {
 			// Randomlly get a new game block
 			this->mBlockId = rand() % (BLOCKS_COUNT - 1) + 1;
@@ -317,19 +316,21 @@ void Game::GenerateSceneItems() {
 			this->mCamera->AccelerateSpeed();
 		}
 
-		// fills the queue with the slice items
+		// Fills the queue with the slice items
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				// don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
+				// Don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
 				if (mSceneBlocks[mBlockId][mBlockSliceIdx][y][x] == GEM) {
 					int random = rand() % 20;
+
 					if (random == 0)
 						this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
 					else
 						this->mGrid[y][x].push(COIN);
 				}
-				else
-				this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+				else {
+					this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+				}
 			}
 		}
 
@@ -361,10 +362,10 @@ void Game::ClearGrid() {
 /* Resets the game initial values */
 void Game::ResetGame() {
 	this->mScore = 0;
-	this->mCoinValue = 1;
-	this->mDoubleScore = false;
-	this->mGameStartTime = (int)glfwGetTime();
+	this->mGameTime = 0;
 	this->mGameState = RUNNING;
+	this->mCoinValue = COIN_VALUE;
+	this->mDoubleScore = false;
 
 	this->mCamera->SetPosition(CAMERA_POSITION_INIT);
 	this->mCamera->SetMoveSpeed(CAMERA_SPEED_INIT);
@@ -445,7 +446,6 @@ void Game::InitCamera() {
 	int w, h;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
 	mCamera = new Camera(CAMERA_POSITION_INIT, (double)w / (double)h);
-	//mCamera->SetMoveAcceleration(CAMERA_ACCELERATION);
 }
 
 /* Initializes the game light sources */
