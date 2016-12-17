@@ -82,9 +82,11 @@ const double FONT_SIZE = 48.0f;
 const double FONT_MARGIN = 25.0f;
 const double FONT_SCALE = 1.0f;
 const double MENU_FONT_SCALE = 0.6f;
+const double TITLE_FONT_SCALE = 1.2f;
 const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 
 // Menu constants
+const string GAME_TITLE = "Tunnel Runner";
 const string MENU_MSG = "Press Q to quit, R to replay";
 const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score: ";

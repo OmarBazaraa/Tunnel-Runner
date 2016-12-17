@@ -189,9 +189,16 @@ void Game::RenderText() {
 		this->mTextRenderer->RenderText(*this->mTextShader, GAME_OVER_MSG, x, y, MENU_FONT_SCALE, FONT_COLOR);
 	}
 
-	// Quit and reply message
+	// Not running messages
 	if (this->mGameState != RUNNING) {
-		int textWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
+		// Title
+		int textWidth = this->mTextRenderer->GetTextWidth(GAME_TITLE, TITLE_FONT_SCALE);
+		x = (w - textWidth) / 2;
+		y = h / 2 - FONT_SIZE * TITLE_FONT_SCALE + FONT_MARGIN * 7;
+		this->mTextRenderer->RenderText(*this->mTextShader, GAME_TITLE, x, y, TITLE_FONT_SCALE, FONT_COLOR);
+
+		// Quit and replay
+		textWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
 		x = (w - textWidth) / 2;
 		y = h / 2 - FONT_SIZE * MENU_FONT_SCALE;
 		this->mTextRenderer->RenderText(*this->mTextShader, MENU_MSG, x, y, MENU_FONT_SCALE, FONT_COLOR);
