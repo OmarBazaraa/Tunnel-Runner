@@ -128,7 +128,7 @@ void Game::Render() {
 					this->mCoin->Draw(*this->mShader);
 					break;
 				case GEM:
-					this->mGem->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mGem->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mGem->ModelMatrix = glm::scale(this->mGem->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
 					this->mGem->ModelMatrix = glm::rotate(this->mGem->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mGem->Draw(*this->mShader);
@@ -253,13 +253,13 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		return;
 	}
 
-		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
-			for (int x = 0; x < LANES_X_COUNT; x++) {
-				GameItem front = this->mGrid[y][x].front();
-				this->mGrid[y][x].pop();
-				this->mGrid[y][x].push(front);
-			}
-		}*/
+	/*for (int y = 0; y < LANES_Y_COUNT; y++) {
+	for (int x = 0; x < LANES_X_COUNT; x++) {
+	GameItem front = this->mGrid[y][x].front();
+	this->mGrid[y][x].pop();
+	this->mGrid[y][x].push(front);
+	}
+	}*/
 
 	// Set left and right borders
 	this->mBorderLeft = (x <= 0) ? BLOCK : this->mGrid[y][x - 1].front();
@@ -267,10 +267,10 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 
 	// Set gravity position
 	for (int i = y; i >= 0; --i) {
-			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
+		if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
 			this->mCamera->SetGravityPosition(i * LANE_HEIGHT + GRAVITY_POS);
-				break;
-			}
+			break;
+		}
 	}
 
 	// Detected collision
@@ -279,16 +279,16 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		this->mGrid[y][x].front() = EMPTY;
 	}
 
-		/*for (int z = 1; z < LANES_Z_COUNT; z++) {
-			for (int y = 0; y < LANES_Y_COUNT; y++) {
-				for (int x = 0; x < LANES_X_COUNT; x++) {
-					GameItem front = this->mGrid[y][x].front();
-					this->mGrid[y][x].pop();
-					this->mGrid[y][x].push(front);
-				}
-			}
-		}*/
+	/*for (int z = 1; z < LANES_Z_COUNT; z++) {
+	for (int y = 0; y < LANES_Y_COUNT; y++) {
+	for (int x = 0; x < LANES_X_COUNT; x++) {
+	GameItem front = this->mGrid[y][x].front();
+	this->mGrid[y][x].pop();
+	this->mGrid[y][x].push(front);
 	}
+	}
+	}*/
+}
 
 /* Executes actions according to different types of collision with game items */
 void Game::Collide(GameItem item) {
@@ -298,7 +298,7 @@ void Game::Collide(GameItem item) {
 		this->mGameState = LOST;
 		break;
 	case COIN:
-		this->mScore += mCoinValue;
+		this->mScore += this->mCoinValue;
 		this->mSoundEngine->play2D("Sounds/Coin.mp3");
 		break;
 	case GEM:
@@ -306,9 +306,9 @@ void Game::Collide(GameItem item) {
 		if (!mDoubleScore) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
-	}
+		}
 		break;
-}
+	}
 }
 
 /* Generates all of the scene items */
