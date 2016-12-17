@@ -72,8 +72,8 @@ const double RING_RADIUS = 0.5;
 const double RING_DEPTH = 0.2;
 
 // Camera constants
-const double CHARACTER_OFFSET = LANE_DEPTH;
 const double GRAVITY_POS = LANE_HEIGHT;
+const double CHARACTER_OFFSET = LANE_DEPTH * 1.5;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT;
 const double CAMERA_ACCELERATION = 0.1f;
@@ -182,10 +182,10 @@ private:
 	void DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/);
 
 	/* Gets a slice from the game grid at certain offset in Z lanes*/
-	void GetSlice(int offset);
+	void GetSlice(int idx);
 
 	/* Edits a slice after collision */
-	void EditSlice(int offset);
+	void EditSlice(int idx);
 
 	/* Executes actions according to different types of collision with game items */
 	void Collide(GameItem item);

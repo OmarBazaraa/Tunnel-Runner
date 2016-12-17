@@ -258,6 +258,7 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 
 	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
 	int y = (characterPos.y) / LANE_HEIGHT;
+	int z = CHARACTER_OFFSET / LANE_DEPTH;
 
 	if (x <= 0)
 		this->mBorderLeft = BLOCK;
@@ -274,7 +275,7 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		return;
 	}
 
-	this->GetSlice(CHARACTER_OFFSET);
+	this->GetSlice(z);
 
 	// Set left and right borders
 	this->mBorderLeft = (x <= 0) ? BLOCK : mCharacterGrid[y][x - 1];
@@ -297,20 +298,19 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		}
 	}
 
-	this->EditSlice(CHARACTER_OFFSET);
+	this->EditSlice(z);
 }
 
 /* Gets a slice from the game grid at certain offset in Z lanes*/
-void Game::GetSlice(int offset) {
+void Game::GetSlice(int idx) {
 	if (mGrid[0][0].empty())
 		return;
 
-	offset %= LANES_Z_COUNT;
 	stack<GameItem> temp;
 
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
 		for (int x = 0; x < LANES_X_COUNT; ++x) {
-			for (int z = 0; z <= offset; ++z) {
+			for (int z = 0; z <= idx; ++z) {
 				temp.push(this->mGrid[y][x].front());
 				this->mGrid[y][x].pop_front();
 			}
@@ -326,16 +326,15 @@ void Game::GetSlice(int offset) {
 }
 
 /* Edits a slice after collision */
-void Game::EditSlice(int offset) {
+void Game::EditSlice(int idx) {
 	if (mGrid[0][0].empty())
 		return;
 
-	offset %= LANES_Z_COUNT;
 	stack<GameItem> temp;
 
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
 		for (int x = 0; x < LANES_X_COUNT; ++x) {
-			for (int z = 0; z <= offset; ++z) {
+			for (int z = 0; z <= idx; ++z) {
 				temp.push(this->mGrid[y][x].front());
 				this->mGrid[y][x].pop_front();
 			}
