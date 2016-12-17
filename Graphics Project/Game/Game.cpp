@@ -57,7 +57,7 @@ void Game::Update() {
 	// Update camera to give animation effects
 	this->mCamera->MoveStep(FORWARD, LANE_DEPTH);
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
-	
+
 	// Update light sources
 	this->mColorValue += 0.005f;
 	if (this->mColorValue > 2.5f) {
@@ -225,10 +225,15 @@ void Game::ProcessMouseInput() {
 
 /* Detects the collision with the character and returns the colliding item */
 void Game::DetectCollision(glm::vec3 characterPos) {
-	this->mBorderLeft = this->mBorderRight = BLOCK;
+	this->mBorderLeft = this->mBorderRight = EMPTY;
 
 	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
 	int y = (characterPos.y) / LANE_HEIGHT;
+
+	if (x == 0)
+		this->mBorderLeft = BLOCK;
+	if (x + 1 == LANES_X_COUNT)
+		this->mBorderRight = BLOCK;
 
 	if (characterPos.x - int(characterPos.x / LANE_WIDTH) * LANE_WIDTH)
 		++x;
@@ -240,13 +245,13 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		return;
 	}
 
-	/*for (int y = 0; y < LANES_Y_COUNT; y++) {
-		for (int x = 0; x < LANES_X_COUNT; x++) {
-			GameItem front = this->mGrid[y][x].front();
-			this->mGrid[y][x].pop();
-			this->mGrid[y][x].push(front);
-		}
-	}*/
+		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
+			for (int x = 0; x < LANES_X_COUNT; x++) {
+				GameItem front = this->mGrid[y][x].front();
+				this->mGrid[y][x].pop();
+				this->mGrid[y][x].push(front);
+			}
+		}*/
 
 	// Set left and right borders
 	this->mBorderLeft = (x <= 0) ? BLOCK : this->mGrid[y][x - 1].front();
@@ -254,10 +259,10 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 
 	// Set gravity position
 	for (int i = y; i >= 0; --i) {
-		if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
+			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
 			this->mCamera->SetGravityPosition(i * LANE_HEIGHT + GRAVITY_POS);
-			break;
-		}
+				break;
+			}
 	}
 
 	// Detected collision
@@ -266,16 +271,16 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		this->mGrid[y][x].front() = EMPTY;
 	}
 
-	/*for (int z = 1; z < LANES_Z_COUNT; z++) {
-		for (int y = 0; y < LANES_Y_COUNT; y++) {
-			for (int x = 0; x < LANES_X_COUNT; x++) {
-				GameItem front = this->mGrid[y][x].front();
-				this->mGrid[y][x].pop();
-				this->mGrid[y][x].push(front);
+		/*for (int z = 1; z < LANES_Z_COUNT; z++) {
+			for (int y = 0; y < LANES_Y_COUNT; y++) {
+				for (int x = 0; x < LANES_X_COUNT; x++) {
+					GameItem front = this->mGrid[y][x].front();
+					this->mGrid[y][x].pop();
+					this->mGrid[y][x].push(front);
+				}
 			}
-		}
-	}*/
-}
+		}*/
+	}
 
 /* Executes actions according to different types of collision with game items */
 void Game::Collide(GameItem item) {
@@ -344,7 +349,7 @@ void Game::ResetGame() {
 	this->mScore = 0;
 	this->mGameStartTime = (int)glfwGetTime();
 	this->mGameState = RUNNING;
-	
+
 	this->mCamera->SetPosition(CAMERA_POSITION_INIT);
 	this->mCamera->SetMoveSpeed(CAMERA_SPEED_INIT);
 	this->mCamera->StopAnimation();
