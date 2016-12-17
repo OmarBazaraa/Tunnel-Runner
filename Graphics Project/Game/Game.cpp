@@ -92,6 +92,14 @@ GameItem Game::DetectCollision(glm::vec3 character) {
 	if (character.y - int(character.y / LANE_HEIGHT) * LANE_HEIGHT) y++;
 	
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
+		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
+			for (int x = 0; x < LANES_X_COUNT; x++) {
+				GameItem front = this->mGrid[y][x].front();
+				this->mGrid[y][x].pop();
+				this->mGrid[y][x].push(front);
+			}
+		}*/
+
 		colliding = this->mGrid[y][x].front();
 
 		if (x == 0)mColliding.Left = BLOCK;
@@ -106,6 +114,16 @@ GameItem Game::DetectCollision(glm::vec3 character) {
 				break;
 			}
 		this->mGrid[y][x].front() = EMPTY;
+
+		/*for (int z = 1; z < LANES_Z_COUNT; z++) {
+			for (int y = 0; y < LANES_Y_COUNT; y++) {
+				for (int x = 0; x < LANES_X_COUNT; x++) {
+					GameItem front = this->mGrid[y][x].front();
+					this->mGrid[y][x].pop();
+					this->mGrid[y][x].push(front);
+				}
+			}
+		}*/
 	}
 	return colliding;
 }

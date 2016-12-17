@@ -127,7 +127,7 @@ private:
 	// Game properties and variables
 	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
 	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
-	int mBlockId;
+	int mBlockId, mCurrentBlockId, mCurrentBlockSliceIdx;
 	int mScore;
 	GameState mGameState;
 	bool mEscReleased = true;
