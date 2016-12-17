@@ -66,10 +66,25 @@ void Game::Update() {
 	}
 
 	// Update camera to give animation effects
+	glm::vec3 camPos = this->mCamera->GetPosition();
+	camPos.z -= LANE_DEPTH;
+	this->mCamera->SetPosition(camPos);
 	this->mCamera->MoveStep(FORWARD, LANE_DEPTH);
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 
 	// Update light sources
+	/*
+	this->mColorValue += 0.005f;
+	if (this->mColorValue > 2.5f) {
+		this->mColorValue = 0;
+	}
+	double r = abs(sin(this->mColorValue) / 2.0f) + 0.5f;
+	double g = abs(cos(this->mColorValue) / 2.0f) + 0.5f;
+	double b = abs(tan(this->mColorValue) / 2.0f) + 0.5f;
+	this->mLight->SpecularColor = glm::vec3(r, g, b);
+	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
+	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
+	*/
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
@@ -78,7 +93,9 @@ void Game::Update() {
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
 	// Detect collisions
-	this->DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION_INIT);
+	glm::vec3 pos = this->mCamera->GetPosition() - CAMERA_POSITION_INIT;
+	//pos.z += LANE_DEPTH * 2;
+	this->DetectCollision(pos);
 	
 	// Update the scene items to be rendered
 	this->GenerateSceneItems();
@@ -105,12 +122,12 @@ void Game::Render() {
 				switch (cell)
 				{
 				case BLOCK:
-					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, 0.5f * CUBE_HEIGHT + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, 0.5f * CUBE_HEIGHT + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_WIDTH, CUBE_HEIGHT, CUBE_DEPTH));
 					this->mCube->Draw(*this->mShader);
 					break;
 				case COIN:
-					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, COIN_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, COIN_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mCoin->ModelMatrix = glm::scale(this->mCoin->ModelMatrix, glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
@@ -226,9 +243,9 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
 	int y = (characterPos.y) / LANE_HEIGHT;
 
-	if (x == 0)
+	if (x <= 0)
 		this->mBorderLeft = BLOCK;
-	if (x + 1 == LANES_X_COUNT)
+	if (x + 1 >= LANES_X_COUNT)
 		this->mBorderRight = BLOCK;
 
 	if (characterPos.x - int(characterPos.x / LANE_WIDTH) * LANE_WIDTH)
@@ -279,8 +296,8 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 	}
 
 /* Executes actions according to different types of collision with game items */
-void Game::Collide(GameItem collidingItem) {
-	switch (collidingItem)
+void Game::Collide(GameItem item) {
+	switch (item)
 	{
 	case BLOCK:
 		this->mGameState = LOST;
@@ -294,9 +311,9 @@ void Game::Collide(GameItem collidingItem) {
 		if (!mDoubleScore) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
-		}
-		break;
 	}
+		break;
+}
 }
 
 /* Generates all of the scene items */
@@ -327,7 +344,7 @@ void Game::GenerateSceneItems() {
 						this->mGrid[y][x].push(COIN);
 				}
 				else
-					this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+				this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
 			}
 		}
 
@@ -443,7 +460,7 @@ void Game::InitCamera() {
 	int w, h;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
 	mCamera = new Camera(CAMERA_POSITION_INIT, (double)w / (double)h);
-	mCamera->SetMoveAcceleration(CAMERA_ACCELERATION);
+	//mCamera->SetMoveAcceleration(CAMERA_ACCELERATION);
 }
 
 /* Initializes the game light sources */

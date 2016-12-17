@@ -71,7 +71,7 @@ const double RING_RADIUS = 0.5;
 const double RING_DEPTH = 0.2;
 
 // Camera constants
-const double GRAVITY_POS = 1.0f;
+const double GRAVITY_POS = LANE_HEIGHT;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT * 1.5f;
 const double CAMERA_ACCELERATION = 0.1f;
@@ -138,6 +138,7 @@ private:
 	int mGameStartTime;
 	double mDoubleScoreTime;
 	bool mEscReleased = true, mDoubleScore;
+	float mColorValue = 0.0f;
 
 public:
 	/* Constructs a new game with all related objects and components */
@@ -170,7 +171,7 @@ private:
 	void DetectCollision(glm::vec3 characterPos);
 
 	/* Executes actions according to different types of collision with game items */
-	void Collide(GameItem collidingItem);
+	void Collide(GameItem item);
 
 	/* Generates all of the scene items */
 	void GenerateSceneItems();

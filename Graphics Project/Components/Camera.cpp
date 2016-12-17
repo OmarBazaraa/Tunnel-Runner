@@ -89,6 +89,21 @@ void Camera::AccelerateSpeed() {
 	}
 }
 
+/* Returns whether the camera is moving left */
+bool Camera::IsMovingLeft() const {
+	return this->mIsMovingHorizontalStep && this->mMoveHorizontalDirection < 0.0f;
+}
+
+/* Returns whether the camera is moving right */
+bool Camera::IsMovingRight() const {
+	return this->mIsMovingHorizontalStep && this->mMoveHorizontalDirection > 0.0f;
+}
+
+/* Returns whether the camera is jumping */
+bool Camera::IsJumping() const {
+	return this->mIsJumping;
+}
+
 /* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
 glm::mat4 Camera::GetViewMatrix() const {
 	return glm::lookAt(this->mPosition, this->mPosition + this->mFront, this->mUp);
@@ -150,8 +165,7 @@ void Camera::Jump(double offset) {
 	// TODO: Force the camera to jump with a certain offset
 	if (!this->mIsJumping) {
 		this->mIsJumping = true;
-		this->mJumpVelocity = JUMP_SPEED;
-		this->mJumpOffset = offset;
+		this->mJumpVelocity = std::sqrt(2 * JUMP_ACCELERATION * offset);
 	}
 }
 
@@ -190,7 +204,6 @@ void Camera::Update(double deltaTime) {
 		this->mJumpVelocity -= this->mJumpAcceleration * deltaTime;
 
 		this->mPosition.y += velocity;
-		this->mJumpOffset -= velocity;
 
 		if (this->mPosition.y <= this->mGroundPosition) {
 			this->mPosition.y = this->mGroundPosition;
