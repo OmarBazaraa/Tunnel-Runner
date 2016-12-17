@@ -115,7 +115,8 @@ GameItem Game::DetectCollision(glm::vec3 character) {
 /* Executes actions according to collision with different game items */
 void Game::Collide(GameItem colliding) {
 	if (colliding == COIN) {
-		this->mScore++;		
+		this->mScore++;
+		this->mSoundEngine->play2D("Sounds/Coin.mp3");
 	}
 	else if (colliding == BLOCK) {
 		this->mGameState = LOST;
