@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <stack>
 #include <time.h>
 #include <fstream>
 using namespace std;
@@ -27,7 +28,7 @@ using namespace irrklang;
 
 
 /*
-	Defines several game items used in filling the game grid
+Defines several game items used in filling the game grid
 */
 enum GameItem {
 	EMPTY,
@@ -38,7 +39,7 @@ enum GameItem {
 };
 
 /*
-	Defines several game states
+Defines several game states
 */
 enum GameState {
 	RUNNING,
@@ -95,12 +96,13 @@ const string FPS_LABEL = "FPS: ";
 const string GEM_LABEL = "GEM: ";
 
 // Game constants
+const int CHARACTER_OFFSET = 1;
 const int COIN_VALUE = 1;
 const double DOUBLE_SCORE_DURATION = 10.0f;
 
 
 /*
-	Class containing all our game logic and drawing
+Class containing all our game logic and drawing
 */
 class Game
 {
@@ -125,10 +127,11 @@ private:
 	LightSource* mLight;
 	// Text renderers
 	TextRenderer* mTextRenderer;
-	
+
 	// Scene variables
-	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
+	deque<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	GameItem mCharacterGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	GameItem mBorderLeft;
 	GameItem mBorderRight;
 	int mBlockId;
@@ -143,7 +146,7 @@ private:
 	double mDoubleScoreTime;
 	bool mDoubleScore;
 	bool mEscReleased = true;
-	
+
 public:
 	/* Constructs a new game with all related objects and components */
 	Game(GameEngine* engine, const char* title);
@@ -171,8 +174,14 @@ private:
 	/* Processes inputs from mouse */
 	void ProcessMouseInput();
 
+	/* Gets a slice from the game grid at certain offset in Z lanes*/
+	void GetSlice(int offset);
+
+	/* edits a slice after collision */
+	void EditSlice(int offset);
+
 	/* Detects the collision with the character and returns the colliding item */
-	void DetectCollision(glm::vec3 characterPos);
+	void DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/);
 
 	/* Executes actions according to different types of collision with game items */
 	void Collide(GameItem item);

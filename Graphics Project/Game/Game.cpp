@@ -90,8 +90,9 @@ void Game::Update() {
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
 	// Detect collisions
-	this->DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION_INIT);
-	
+	GetSlice(CHARACTER_OFFSET);
+	this->DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION_INIT/*, GetSlice(CHARACTER_OFFSET)*/);
+	EditSlice(CHARACTER_OFFSET);
 	// Update the scene items to be rendered
 	this->GenerateSceneItems();
 }
@@ -111,8 +112,8 @@ void Game::Render() {
 		for (int x = 0; x < LANES_X_COUNT; ++x) {
 			for (int z = 0; z < this->mGrid[y][x].size(); ++z) {
 				GameItem cell = this->mGrid[y][x].front();
-				this->mGrid[y][x].pop();
-				this->mGrid[y][x].push(cell);
+				this->mGrid[y][x].pop_front();
+				this->mGrid[y][x].push_back(cell);
 
 				switch (cell)
 				{
@@ -249,8 +250,52 @@ void Game::ProcessMouseInput() {
 	this->mCamera->ChangeDirection(xpos, ypos, this->mEngine->mTimer->ElapsedFramesTime);
 }
 
+/* Gets a slice from the game grid at certain offset in Z lanes*/
+void Game::GetSlice(int offset) {
+	if (mGrid[0][0].empty())
+		return;
+	offset %= LANES_Z_COUNT;
+	stack<GameItem> temp;
+	//GameItem ret[LANES_Y_COUNT][LANES_X_COUNT];
+	for (int i = 0; i < LANES_Y_COUNT; ++i) {
+		for (int j = 0; j < LANES_X_COUNT; ++j) {
+			for (int k = 0; k <= offset; ++k) {
+				temp.push(this->mGrid[i][j].front());
+				this->mGrid[i][j].pop_front();
+			}
+			mCharacterGrid[i][j] = temp.top();
+			while (!temp.empty()) {
+				this->mGrid[i][j].push_front(temp.top());
+				temp.pop();
+			}
+		}
+	}
+}
+
+/* edits a slice after collision */
+void Game::EditSlice(int offset) {
+	if (mGrid[0][0].empty())
+		return;
+	offset %= LANES_Z_COUNT;
+	stack<GameItem> temp;
+	//GameItem ret[LANES_Y_COUNT][LANES_X_COUNT];
+	for (int i = 0; i < LANES_Y_COUNT; ++i) {
+		for (int j = 0; j < LANES_X_COUNT; ++j) {
+			for (int k = 0; k <= offset; ++k) {
+				temp.push(this->mGrid[i][j].front());
+				this->mGrid[i][j].pop_front();
+			}
+			temp.top() = mCharacterGrid[i][j];
+			while (!temp.empty()) {
+				this->mGrid[i][j].push_front(temp.top());
+				temp.pop();
+			}
+		}
+	}
+}
+
 /* Detects the collision with the character and returns the colliding item */
-void Game::DetectCollision(glm::vec3 characterPos) {
+void Game::DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/) {
 	this->mBorderLeft = this->mBorderRight = EMPTY;
 
 	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
@@ -265,37 +310,28 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 	if (this->mCamera->IsJumping())++y;
 
 	// Check if out of range
-	if (y < 0 || y >= LANES_Y_COUNT || x < 0 || x >= LANES_X_COUNT || mGrid[y][x].empty()) {
+	if (y < 0 || y >= LANES_Y_COUNT || x < 0 || x >= LANES_X_COUNT) {
 		return;
 	}
 
 	// Set left and right borders
-	this->mBorderLeft = (x <= 0) ? BLOCK : this->mGrid[y][x - 1].front();
-	this->mBorderRight = (x + 1 >= LANES_X_COUNT) ? BLOCK : this->mGrid[y][x + 1].front();
+	this->mBorderLeft = (x <= 0) ? BLOCK : mCharacterGrid[y][x - 1];
+	this->mBorderRight = (x + 1 >= LANES_X_COUNT) ? BLOCK : mCharacterGrid[y][x + 1];
 
 	// Set gravity position
 	for (int i = y; i >= 0; --i) {
-		if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
+		if (i == 0 || mCharacterGrid[i - 1][x] == BLOCK) {
 			this->mCamera->SetGravityPosition(i * LANE_HEIGHT + GRAVITY_POS);
 			break;
 		}
 	}
 
 	// Detected collision
-	if (this->mGrid[y][x].front() != EMPTY) {
-		this->Collide(this->mGrid[y][x].front());
-		this->mGrid[y][x].front() = EMPTY;
+	if (mCharacterGrid[y][x] != EMPTY) {
+		this->Collide(mCharacterGrid[y][x]);
+		if (mCharacterGrid[y][x] != BLOCK)mCharacterGrid[y][x] = EMPTY;
 	}
 
-	/*for (int z = 1; z < LANES_Z_COUNT; z++) {
-	for (int y = 0; y < LANES_Y_COUNT; y++) {
-	for (int x = 0; x < LANES_X_COUNT; x++) {
-	GameItem front = this->mGrid[y][x].front();
-	this->mGrid[y][x].pop();
-	this->mGrid[y][x].push(front);
-	}
-	}
-	}*/
 }
 
 /* Executes actions according to different types of collision with game items */
@@ -344,12 +380,12 @@ void Game::GenerateSceneItems() {
 					int random = rand() % 20;
 
 					if (random == 0)
-						this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+						this->mGrid[y][x].push_back(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
 					else
-						this->mGrid[y][x].push(COIN);
+						this->mGrid[y][x].push_back(COIN);
 				}
 				else {
-					this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+					this->mGrid[y][x].push_back(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
 				}
 			}
 		}
@@ -370,7 +406,7 @@ void Game::ClearGrid() {
 
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				this->mGrid[y][x].pop();
+				this->mGrid[y][x].pop_front();
 			}
 		}
 
@@ -396,11 +432,11 @@ void Game::ResetGame() {
 	this->mBlockSliceIdx = 0;
 	this->mBorderLeft = EMPTY;
 	this->mBorderRight = EMPTY;
-	
+
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
 		for (int x = 0; x < LANES_X_COUNT; ++x) {
 			while (!mGrid[y][x].empty()) {
-				this->mGrid[y][x].pop();
+				this->mGrid[y][x].pop_front();
 			}
 		}
 	}
