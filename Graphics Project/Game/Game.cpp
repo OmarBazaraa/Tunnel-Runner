@@ -128,7 +128,7 @@ void Game::Render() {
 					this->mCoin->Draw(*this->mShader);
 					break;
 				case GEM:
-					this->mGem->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mGem->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mGem->ModelMatrix = glm::scale(this->mGem->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
 					this->mGem->ModelMatrix = glm::rotate(this->mGem->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mGem->Draw(*this->mShader);
@@ -290,7 +290,7 @@ void Game::Collide(GameItem item) {
 		this->mGameState = LOST;
 		break;
 	case COIN:
-		this->mScore += mCoinValue;
+		this->mScore += this->mCoinValue;
 		this->mSoundEngine->play2D("Sounds/Coin.mp3");
 		break;
 	case GEM:
