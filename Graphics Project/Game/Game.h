@@ -92,7 +92,7 @@ const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score: ";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
-const string GEM_LABEL = "GEM: ";
+const string GEM_LABEL = "GEM (x2): ";
 
 // Game constants
 const int COIN_VALUE = 1;
@@ -125,6 +125,10 @@ private:
 	LightSource* mLight;
 	// Text renderers
 	TextRenderer* mTextRenderer;
+	double mGameTitleLabelWidth;
+	double mGameOverMsgWidth;
+	double mMenuMsgWidth;
+	double mGemLabelWidth;
 	
 	// Scene variables
 	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];

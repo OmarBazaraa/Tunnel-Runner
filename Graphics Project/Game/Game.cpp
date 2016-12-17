@@ -175,31 +175,27 @@ void Game::RenderText() {
 		ss.clear();
 		ss.str("");
 		ss << GEM_LABEL << (int)(((DOUBLE_SCORE_DURATION - this->mDoubleScoreTime) / DOUBLE_SCORE_DURATION) * 100) << "%";
-		int textWidth = this->mTextRenderer->GetTextWidth(ss.str(), FONT_SCALE);
-		x = (w - textWidth) / 2;
+		x = (w - this->mGemLabelWidth) / 2;
 		y = h - FONT_MARGIN - FONT_SIZE;
 		this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
 	}
 
 	// Game over label
 	if (this->mGameState == LOST) {
-		int textWidth = this->mTextRenderer->GetTextWidth(GAME_OVER_MSG, MENU_FONT_SCALE);
-		x = (w - textWidth) / 2;
+		x = (w - this->mGameOverMsgWidth) / 2;
 		y = h / 2 - FONT_SIZE * MENU_FONT_SCALE + FONT_MARGIN * 2;
 		this->mTextRenderer->RenderText(*this->mTextShader, GAME_OVER_MSG, x, y, MENU_FONT_SCALE, FONT_COLOR);
 	}
 
-	// Not running messages
+	// Game paused messages
 	if (this->mGameState != RUNNING) {
 		// Title
-		int textWidth = this->mTextRenderer->GetTextWidth(GAME_TITLE, TITLE_FONT_SCALE);
-		x = (w - textWidth) / 2;
+		x = (w - this->mGameTitleLabelWidth) / 2;
 		y = h / 2 - FONT_SIZE * TITLE_FONT_SCALE + FONT_MARGIN * 7;
 		this->mTextRenderer->RenderText(*this->mTextShader, GAME_TITLE, x, y, TITLE_FONT_SCALE, FONT_COLOR);
 
 		// Quit and replay
-		textWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
-		x = (w - textWidth) / 2;
+		x = (w - mMenuMsgWidth) / 2;
 		y = h / 2 - FONT_SIZE * MENU_FONT_SCALE;
 		this->mTextRenderer->RenderText(*this->mTextShader, MENU_MSG, x, y, MENU_FONT_SCALE, FONT_COLOR);
 	}
@@ -234,8 +230,14 @@ void Game::ProcessKeyInput() {
 		this->mCamera->MoveStep(LEFT, LANE_WIDTH);
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS && mBorderRight != BLOCK)
 		this->mCamera->MoveStep(RIGHT, LANE_WIDTH);
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS)
+
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		if (!this->mCamera->IsJumping()) {
+			this->mSoundEngine->play2D("Sounds/Jump.wav");
+		}
+
 		this->mCamera->Jump(CAMERA_JUMP_OFFSET);
+	}
 }
 
 /* Processes inputs from mouse */
@@ -484,4 +486,9 @@ void Game::InitTextRenderers() {
 	int w, h;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
 	this->mTextRenderer = new TextRenderer("Fonts/nickname.ttf", FONT_SIZE, w, h);
+
+	this->mGameTitleLabelWidth = this->mTextRenderer->GetTextWidth(GAME_TITLE, TITLE_FONT_SCALE);
+	this->mGameOverMsgWidth = this->mTextRenderer->GetTextWidth(GAME_OVER_MSG, MENU_FONT_SCALE);
+	this->mMenuMsgWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
+	this->mGemLabelWidth = this->mTextRenderer->GetTextWidth(GEM_LABEL + "100%", FONT_SCALE);
 }
