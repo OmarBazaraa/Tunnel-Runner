@@ -72,6 +72,7 @@ const double RING_RADIUS = 0.5;
 const double RING_DEPTH = 0.2;
 
 // Camera constants
+const double CHARACTER_OFFSET = LANE_DEPTH;
 const double GRAVITY_POS = LANE_HEIGHT;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT;
@@ -96,7 +97,6 @@ const string FPS_LABEL = "FPS: ";
 const string GEM_LABEL = "GEM (x2): ";
 
 // Game constants
-const int CHARACTER_OFFSET = 1;
 const int COIN_VALUE = 1;
 const double DOUBLE_SCORE_DURATION = 10.0f;
 
@@ -178,14 +178,14 @@ private:
 	/* Processes inputs from mouse */
 	void ProcessMouseInput();
 
+	/* Detects the collision with the character and returns the colliding item */
+	void DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/);
+
 	/* Gets a slice from the game grid at certain offset in Z lanes*/
 	void GetSlice(int offset);
 
-	/* edits a slice after collision */
+	/* Edits a slice after collision */
 	void EditSlice(int offset);
-
-	/* Detects the collision with the character and returns the colliding item */
-	void DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/);
 
 	/* Executes actions according to different types of collision with game items */
 	void Collide(GameItem item);

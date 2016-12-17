@@ -91,9 +91,8 @@ void Game::Update() {
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
 	// Detect collisions
-	GetSlice(CHARACTER_OFFSET);
-	this->DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION_INIT/*, GetSlice(CHARACTER_OFFSET)*/);
-	EditSlice(CHARACTER_OFFSET);
+	this->DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION_INIT);
+
 	// Update the scene items to be rendered
 	this->GenerateSceneItems();
 }
@@ -253,52 +252,8 @@ void Game::ProcessMouseInput() {
 	this->mCamera->ChangeDirection(xpos, ypos, this->mEngine->mTimer->ElapsedFramesTime);
 }
 
-/* Gets a slice from the game grid at certain offset in Z lanes*/
-void Game::GetSlice(int offset) {
-	if (mGrid[0][0].empty())
-		return;
-	offset %= LANES_Z_COUNT;
-	stack<GameItem> temp;
-	//GameItem ret[LANES_Y_COUNT][LANES_X_COUNT];
-	for (int i = 0; i < LANES_Y_COUNT; ++i) {
-		for (int j = 0; j < LANES_X_COUNT; ++j) {
-			for (int k = 0; k <= offset; ++k) {
-				temp.push(this->mGrid[i][j].front());
-				this->mGrid[i][j].pop_front();
-			}
-			mCharacterGrid[i][j] = temp.top();
-			while (!temp.empty()) {
-				this->mGrid[i][j].push_front(temp.top());
-				temp.pop();
-			}
-		}
-	}
-}
-
-/* edits a slice after collision */
-void Game::EditSlice(int offset) {
-	if (mGrid[0][0].empty())
-		return;
-	offset %= LANES_Z_COUNT;
-	stack<GameItem> temp;
-	//GameItem ret[LANES_Y_COUNT][LANES_X_COUNT];
-	for (int i = 0; i < LANES_Y_COUNT; ++i) {
-		for (int j = 0; j < LANES_X_COUNT; ++j) {
-			for (int k = 0; k <= offset; ++k) {
-				temp.push(this->mGrid[i][j].front());
-				this->mGrid[i][j].pop_front();
-			}
-			temp.top() = mCharacterGrid[i][j];
-			while (!temp.empty()) {
-				this->mGrid[i][j].push_front(temp.top());
-				temp.pop();
-			}
-		}
-	}
-}
-
 /* Detects the collision with the character and returns the colliding item */
-void Game::DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/) {
+void Game::DetectCollision(glm::vec3 characterPos) {
 	this->mBorderLeft = this->mBorderRight = EMPTY;
 
 	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
@@ -309,13 +264,17 @@ void Game::DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/) {
 	if (x + 1 >= LANES_X_COUNT)
 		this->mBorderRight = BLOCK;
 
-	if (this->mCamera->IsMovingRight())++x;
-	if (this->mCamera->IsJumping())++y;
+	if (this->mCamera->IsMovingRight())
+		++x;
+	if (this->mCamera->IsJumping())
+		++y;
 
 	// Check if out of range
 	if (y < 0 || y >= LANES_Y_COUNT || x < 0 || x >= LANES_X_COUNT) {
 		return;
 	}
+
+	this->GetSlice(CHARACTER_OFFSET);
 
 	// Set left and right borders
 	this->mBorderLeft = (x <= 0) ? BLOCK : mCharacterGrid[y][x - 1];
@@ -332,9 +291,63 @@ void Game::DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/) {
 	// Detected collision
 	if (mCharacterGrid[y][x] != EMPTY) {
 		this->Collide(mCharacterGrid[y][x]);
-		if (mCharacterGrid[y][x] != BLOCK)mCharacterGrid[y][x] = EMPTY;
+
+		if (mCharacterGrid[y][x] != BLOCK) {
+			mCharacterGrid[y][x] = EMPTY;
+		}
 	}
 
+	this->EditSlice(CHARACTER_OFFSET);
+}
+
+/* Gets a slice from the game grid at certain offset in Z lanes*/
+void Game::GetSlice(int offset) {
+	if (mGrid[0][0].empty())
+		return;
+
+	offset %= LANES_Z_COUNT;
+	stack<GameItem> temp;
+
+	for (int y = 0; y < LANES_Y_COUNT; ++y) {
+		for (int x = 0; x < LANES_X_COUNT; ++x) {
+			for (int z = 0; z <= offset; ++z) {
+				temp.push(this->mGrid[y][x].front());
+				this->mGrid[y][x].pop_front();
+			}
+
+			mCharacterGrid[y][x] = temp.top();
+
+			while (!temp.empty()) {
+				this->mGrid[y][x].push_front(temp.top());
+				temp.pop();
+			}
+		}
+	}
+}
+
+/* Edits a slice after collision */
+void Game::EditSlice(int offset) {
+	if (mGrid[0][0].empty())
+		return;
+
+	offset %= LANES_Z_COUNT;
+	stack<GameItem> temp;
+
+	for (int y = 0; y < LANES_Y_COUNT; ++y) {
+		for (int x = 0; x < LANES_X_COUNT; ++x) {
+			for (int z = 0; z <= offset; ++z) {
+				temp.push(this->mGrid[y][x].front());
+				this->mGrid[y][x].pop_front();
+			}
+
+			temp.top() = mCharacterGrid[y][x];
+
+			while (!temp.empty()) {
+				this->mGrid[y][x].push_front(temp.top());
+				temp.pop();
+			}
+		}
+	}
 }
 
 /* Executes actions according to different types of collision with game items */
@@ -343,11 +356,11 @@ void Game::Collide(GameItem item) {
 	{
 	case BLOCK:
 		this->mGameState = LOST;
-		this->mSoundEngine->play2D("Sounds/Gameover2.wav");
+		this->mSoundEngine->play2D("Sounds/game_over.mp3");
 		break;
 	case COIN:
 		this->mScore += this->mCoinValue;
-		this->mSoundEngine->play2D("Sounds/Coin.mp3");
+		this->mSoundEngine->play2D("Sounds/coin.mp3");
 		break;
 	case GEM:
 		this->mDoubleScoreTime = 0;
@@ -355,7 +368,7 @@ void Game::Collide(GameItem item) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
 		}
-		this->mSoundEngine->play2D("Sounds/Coin.mp3");
+		this->mSoundEngine->play2D("Sounds/coin.mp3");
 		break;
 	}
 }
@@ -449,7 +462,7 @@ void Game::ResetGame() {
 /* Initializes the game sounds and background music */
 void Game::InitSounds() {
 	this->mSoundEngine = createIrrKlangDevice();
-	this->mSoundEngine->play2D("Sounds/Conan.mp3", GL_TRUE);
+	this->mSoundEngine->play2D("Sounds/undefeated.mp3", GL_TRUE);
 }
 
 /* Initializes the game models */
