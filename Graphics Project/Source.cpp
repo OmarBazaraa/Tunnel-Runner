@@ -4,7 +4,7 @@
 
 int main() {
 	GameEngine MyGameEngine(1280, 720, false);
-	Game MyGame(&MyGameEngine, "Jumper Ball");
+	Game MyGame(&MyGameEngine, "Tunnel Runner");
 	MyGameEngine.Run();
 	return 0;
 }
