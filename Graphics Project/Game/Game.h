@@ -157,8 +157,10 @@ public:
 private:
 
 	/* Gets the colliding item with the character */
-	void Collide(glm::vec3 character);
+	GameItem DetectCollision(glm::vec3 character);
 
+	/* Executes actions according to collision with different game items */
+	void Collide(GameItem collidingItem);
 
 	/* Renders the text of the game */
 	void RenderText();

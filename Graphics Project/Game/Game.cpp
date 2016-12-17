@@ -71,7 +71,7 @@ void Game::Update() {
 	this->mScene->ModelMatrix = glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.5 * SCENE_HEIGHT, cameraPosition.z - 0.4 * SCENE_DEPTH - CAMERA_POSITION.z));
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
-	Collide(this->mCamera->GetPosition() - CAMERA_POSITION);
+	Collide(DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION));
 	
 	// Populate the game items (mGrid) to be rendered
 	GenerateSceneItems();
@@ -80,8 +80,9 @@ void Game::Update() {
 
 }
 
-void Game::Collide(glm::vec3 character) {
-	GameItem colliding;
+/* Gets the colliding item with the character */
+GameItem Game::DetectCollision(glm::vec3 character) {
+	GameItem colliding = EMPTY;
 	mColliding.Left = mColliding.Right = BLOCK;
 
 	int x = (character.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
@@ -103,15 +104,19 @@ void Game::Collide(glm::vec3 character) {
 			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
 				this->mCamera->SetGravityPosition((i + 1)*LANE_HEIGHT);
 				break;
-			}	
+			}
+		this->mGrid[y][x].front() = EMPTY;
+	}
+	return colliding;
+}
 
-		if (colliding == COIN) {
-			mScore++;
-			this->mGrid[y][x].front() = EMPTY;
-		}
-		else if (colliding == BLOCK) {
- 			this->mGameState = LOST;
-		}
+/* Executes actions according to collision with different game items */
+void Game::Collide(GameItem colliding) {
+	if (colliding == COIN) {
+		this->mScore++;		
+	}
+	else if (colliding == BLOCK) {
+		this->mGameState = LOST;
 	}
 }
 
