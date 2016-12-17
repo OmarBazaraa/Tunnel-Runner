@@ -89,6 +89,21 @@ void Camera::AccelerateSpeed() {
 	}
 }
 
+/* Returns whether the camera is moving left */
+bool Camera::IsMovingLeft() const {
+	return this->mIsMovingHorizontalStep && this->mMoveHorizontalDirection < 0.0f;
+}
+
+/* Returns whether the camera is moving right */
+bool Camera::IsMovingRight() const {
+	return this->mIsMovingHorizontalStep && this->mMoveHorizontalDirection > 0.0f;
+}
+
+/* Returns whether the camera is jumping */
+bool Camera::IsJumping() const {
+	return this->mIsJumping;
+}
+
 /* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
 glm::mat4 Camera::GetViewMatrix() const {
 	return glm::lookAt(this->mPosition, this->mPosition + this->mFront, this->mUp);

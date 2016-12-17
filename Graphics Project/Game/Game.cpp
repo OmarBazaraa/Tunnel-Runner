@@ -55,6 +55,9 @@ void Game::Update() {
 		return;
 
 	// Update camera to give animation effects
+	glm::vec3 camPos = this->mCamera->GetPosition();
+	camPos.z -= LANE_DEPTH;
+	this->mCamera->SetPosition(camPos);
 	this->mCamera->MoveStep(FORWARD, LANE_DEPTH);
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 

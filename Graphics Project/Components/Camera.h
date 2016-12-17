@@ -127,6 +127,15 @@ public:
 	/* Increases the camera speed by the given amount */
 	void AccelerateSpeed();
 
+	/* Returns whether the camera is moving left */
+	bool IsMovingLeft() const;
+
+	/* Returns whether the camera is moving right */
+	bool IsMovingRight() const;
+
+	/* Returns whether the camera is jumping */
+	bool IsJumping() const;
+
 	/* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
 	glm::mat4 GetViewMatrix() const;
 
