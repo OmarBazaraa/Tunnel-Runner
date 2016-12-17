@@ -62,7 +62,7 @@ const double LANE_DEPTH = 1.5f;
 const double SCENE_WIDTH = LANES_X_COUNT * LANE_WIDTH;
 const double SCENE_HEIGHT = (LANES_Y_COUNT + 2) * LANE_HEIGHT;
 const double SCENE_DEPTH = LANES_Z_COUNT * LANE_DEPTH;
-const double CUBE_SIZE = LANE_WIDTH;
+const double CUBE_WIDTH = LANE_WIDTH;
 const double CUBE_HEIGHT = LANE_HEIGHT;
 const double CUBE_DEPTH = LANE_DEPTH;
 const double SPHERE_RADIUS = 0.5f;
@@ -71,7 +71,7 @@ const double RING_RADIUS = 0.5;
 const double RING_DEPTH = 0.2;
 
 // Camera constants
-const double GRAVITY_POS = 1.0f;
+const double GRAVITY_POS = LANE_HEIGHT;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT * 1.5f;
 const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);

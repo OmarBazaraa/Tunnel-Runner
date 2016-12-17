@@ -41,7 +41,7 @@ const double MOVE_SPEED_INIT = 4.0f;
 const double MOVE_SPEED_MAX = 15;
 const double MOVE_ACCELERATION_INIT = 0.01;
 const double JUMP_SPEED = 4.0f;
-const double JUMP_ACCELERATION = 8.0f;			// If you want to jump with a certain height use this EQN => a = (MOVE_SPEED)^2 / (2 * Height)
+const double JUMP_ACCELERATION = 12.0f;			// If you want to jump with a certain height use this EQN => a = (MOVE_SPEED)^2 / (2 * Height)
 const double MOUSE_SENSITIVTY = 5.0f;
 // Camera options
 const double MAX_FOV = 45.0f;
@@ -49,7 +49,6 @@ const double MIN_FOV = 1.0f;
 const double ASPECT_RATIO = 1.3333f;
 const double NEAR_PLANE = 0.1f;
 const double FAR_PLANE = 100.0f;
-const double CAMERA_OFFSET = 1.0f;
 
 /*
 	An abstract camera class that processes input and calculates the corresponding
@@ -85,7 +84,6 @@ private:
 	bool mIsJumping;
 	double mJumpVelocity;
 	double mJumpAcceleration;
-	double mJumpOffset;
 	double mGroundPosition;
 	// Look around
 	double mMouseSensitivity;

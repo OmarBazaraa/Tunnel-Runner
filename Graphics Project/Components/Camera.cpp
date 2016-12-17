@@ -150,8 +150,7 @@ void Camera::Jump(double offset) {
 	// TODO: Force the camera to jump with a certain offset
 	if (!this->mIsJumping) {
 		this->mIsJumping = true;
-		this->mJumpVelocity = JUMP_SPEED;
-		this->mJumpOffset = offset;
+		this->mJumpVelocity = std::sqrt(2 * JUMP_ACCELERATION * offset);
 	}
 }
 
@@ -190,7 +189,6 @@ void Camera::Update(double deltaTime) {
 		this->mJumpVelocity -= this->mJumpAcceleration * deltaTime;
 
 		this->mPosition.y += velocity;
-		this->mJumpOffset -= velocity;
 
 		if (this->mPosition.y <= this->mGroundPosition) {
 			this->mPosition.y = this->mGroundPosition;

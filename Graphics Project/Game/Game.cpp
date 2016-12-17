@@ -79,7 +79,9 @@ void Game::Update() {
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
 	// Detect collisions
-	this->DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION_INIT);
+	glm::vec3 pos = this->mCamera->GetPosition() - CAMERA_POSITION_INIT;
+	//pos.z += LANE_DEPTH * 2;
+	this->DetectCollision(pos);
 	
 	// Update the scene items to be rendered
 	this->GenerateSceneItems();
@@ -106,23 +108,23 @@ void Game::Render() {
 				switch (cell)
 				{
 				case BLOCK:
-					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, 0.5f * CUBE_HEIGHT + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
-					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_DEPTH));
+					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, 0.5f * CUBE_HEIGHT + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_WIDTH, CUBE_HEIGHT, CUBE_DEPTH));
 					this->mCube->Draw(*this->mShader);
 					break;
 				case COIN:
-					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, COIN_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mCoin->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, COIN_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mCoin->ModelMatrix = glm::scale(this->mCoin->ModelMatrix, glm::vec3(COIN_SIZE, COIN_SIZE, COIN_SIZE));
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
 					break;
 				case SPHERE:
-					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, SPHERE_RADIUS + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, SPHERE_RADIUS + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mSphere->ModelMatrix = glm::scale(this->mSphere->ModelMatrix, glm::vec3(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS));
 					this->mSphere->Draw(*this->mShader);
 					break;
 				case RING:
-					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, RING_RADIUS + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, RING_RADIUS + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mRing->ModelMatrix = glm::scale(this->mRing->ModelMatrix, glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
 					this->mRing->Draw(*this->mShader);
 					break;
@@ -231,9 +233,9 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
 	int y = (characterPos.y) / LANE_HEIGHT;
 
-	if (x == 0)
+	if (x <= 0)
 		this->mBorderLeft = BLOCK;
-	if (x + 1 == LANES_X_COUNT)
+	if (x + 1 >= LANES_X_COUNT)
 		this->mBorderRight = BLOCK;
 
 	if (characterPos.x - int(characterPos.x / LANE_WIDTH) * LANE_WIDTH)
