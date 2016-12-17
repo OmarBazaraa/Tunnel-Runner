@@ -218,7 +218,7 @@ void Game::ProcessMouseInput() {
 /* Detects the collision with the character and returns the colliding item */
 GameItem Game::DetectCollision(glm::vec3 characterPos) {
 	GameItem colliding = EMPTY;
-	mColliding.Left = mColliding.Right = BLOCK;
+	mColliding.Left = mColliding.Right = EMPTY;
 
 	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
 	int y = (characterPos.y) / LANE_HEIGHT;
@@ -226,6 +226,12 @@ GameItem Game::DetectCollision(glm::vec3 characterPos) {
 	if (characterPos.x - int(characterPos.x / LANE_WIDTH) * LANE_WIDTH) x++;
 	if (characterPos.y - int(characterPos.y / LANE_HEIGHT) * LANE_HEIGHT) y++;
 
+	if (x == 0 )
+		mColliding.Left = BLOCK;
+	if (x + 1 == LANES_X_COUNT)
+		mColliding.Right = BLOCK;
+
+	// inside the blocks Range
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
 		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
 			for (int x = 0; x < LANES_X_COUNT; x++) {
@@ -237,11 +243,11 @@ GameItem Game::DetectCollision(glm::vec3 characterPos) {
 
 		colliding = this->mGrid[y][x].front();
 
-		if (x == 0)mColliding.Left = BLOCK;
-		else  mColliding.Left = this->mGrid[y][x - 1].front();
+		if (x > 0)  
+			mColliding.Left = this->mGrid[y][x - 1].front();
 
-		if (x + 1 == LANES_X_COUNT)mColliding.Right = BLOCK;
-		else mColliding.Right = this->mGrid[y][x + 1].front();
+		if (x + 1 < LANES_X_COUNT)
+			mColliding.Right = this->mGrid[y][x + 1].front();
 
 		for (int i = y; i >= 0; --i)
 			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
