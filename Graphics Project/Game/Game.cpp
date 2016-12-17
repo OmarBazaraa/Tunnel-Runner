@@ -89,7 +89,7 @@ void Game::Collide(glm::vec3 character) {
 	GameItem colliding;
 	mColliding.Left = mColliding.Right = EMPTY;
 	int x = character.x / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
-	int y = character.y / LANE_HEIGHT;
+	int y = (character.y + LANE_HEIGHT - 0.001f) / LANE_HEIGHT;
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
 		colliding = this->mGrid[y][x].front();
 
@@ -293,6 +293,7 @@ void Game::ResetGame() {
 	this->mCameraSpeed = CAMERA_SPEED_INIT;
 	this->mZGridIndex = 0;
 	this->mCamera->SetPosition(CAMERA_POSITION);
+	this->mCamera->ResetAnimation();
 	this->mBlockSliceIdx = 0;
 	this->mBlockId = 0;
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {

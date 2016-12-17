@@ -171,7 +171,7 @@ void Camera::Update(double deltaTime) {
 	if (this->mIsJumping) {
 		float velocity = this->mJumpVelocity * deltaTime;
 
-		this->mJumpVelocity -= this->mJumpAcceleration;
+		this->mJumpVelocity -= this->mJumpAcceleration * deltaTime;
 
 		this->mPosition.y += velocity;
 		this->mJumpOffset -= velocity;
@@ -242,6 +242,12 @@ void Camera::Zoom(double offset) {
 		this->mFOV = MIN_FOV;
 	if (this->mFOV >= MAX_FOV)
 		this->mFOV = MAX_FOV;
+}
+
+void Camera::ResetAnimation() {
+	this->mIsJumping = false;
+	this->mIsMovingForwardStep = false;
+	this->mIsMovingHorizontalStep = false;
 }
 
 /* Calculates the front vector from the camera's (updated) Eular Angles */
