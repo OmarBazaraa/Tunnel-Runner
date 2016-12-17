@@ -55,9 +55,6 @@ void Game::Update() {
 		return;
 
 	// Update camera to give animation effects
-	glm::vec3 camPos = this->mCamera->GetPosition();
-	camPos.z -= LANE_DEPTH;
-	this->mCamera->SetPosition(camPos);
 	this->mCamera->MoveStep(FORWARD, LANE_DEPTH);
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 
@@ -82,9 +79,7 @@ void Game::Update() {
 	this->mScene->ModelMatrix = glm::scale(this->mScene->ModelMatrix, glm::vec3(SCENE_WIDTH, SCENE_HEIGHT, SCENE_DEPTH));
 
 	// Detect collisions
-	glm::vec3 pos = this->mCamera->GetPosition() - CAMERA_POSITION_INIT;
-	//pos.z += LANE_DEPTH * 2;
-	this->DetectCollision(pos);
+	this->DetectCollision(this->mCamera->GetPosition() - CAMERA_POSITION_INIT);
 	
 	// Update the scene items to be rendered
 	this->GenerateSceneItems();
