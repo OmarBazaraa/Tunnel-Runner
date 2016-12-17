@@ -74,13 +74,14 @@ void Game::Update() {
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 
 	// Update light sources
+	/*
 	double r = abs(sin(this->mGameTime) / 2.0f) + 0.5f;
 	double g = abs(cos(this->mGameTime) / 2.0f) + 0.5f;
 	double b = 1.0f;// abs(tan(this->mGameTime) / 2.0f) + 0.5f;
 	this->mLight->SpecularColor = glm::vec3(r, g, b);
 	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
 	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
-	
+	*/
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
@@ -168,6 +169,17 @@ void Game::RenderText() {
 	x = FONT_MARGIN;
 	y = FONT_MARGIN;
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
+
+	// Gem percentage
+	if (this->mDoubleScore) {
+		ss.clear();
+		ss.str("");
+		ss << GEM_LABEL << (int)(((DOUBLE_SCORE_DURATION - this->mDoubleScoreTime) / DOUBLE_SCORE_DURATION) * 100) << "%";
+		int textWidth = this->mTextRenderer->GetTextWidth(ss.str(), FONT_SCALE);
+		x = (w - textWidth) / 2;
+		y = h - FONT_MARGIN - FONT_SIZE;
+		this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
+	}
 
 	// Game over label
 	if (this->mGameState == LOST) {
@@ -296,6 +308,7 @@ void Game::Collide(GameItem item) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
 		}
+		this->mSoundEngine->play2D("Sounds/Coin.mp3");
 		break;
 	}
 }

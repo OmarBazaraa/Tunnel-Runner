@@ -90,6 +90,7 @@ const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score: ";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
+const string GEM_LABEL = "GEM: ";
 
 // Game constants
 const int COIN_VALUE = 1;
