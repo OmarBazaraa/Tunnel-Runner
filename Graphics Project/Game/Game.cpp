@@ -59,6 +59,7 @@ void Game::Update() {
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 
 	// Update light sources
+	/*
 	this->mColorValue += 0.005f;
 	if (this->mColorValue > 2.5f) {
 		this->mColorValue = 0;
@@ -69,7 +70,7 @@ void Game::Update() {
 	this->mLight->SpecularColor = glm::vec3(r, g, b);
 	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
 	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
-
+	*/
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
@@ -245,13 +246,13 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		return;
 	}
 
-		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
-			for (int x = 0; x < LANES_X_COUNT; x++) {
-				GameItem front = this->mGrid[y][x].front();
-				this->mGrid[y][x].pop();
-				this->mGrid[y][x].push(front);
-			}
-		}*/
+	/*for (int y = 0; y < LANES_Y_COUNT; y++) {
+		for (int x = 0; x < LANES_X_COUNT; x++) {
+			GameItem front = this->mGrid[y][x].front();
+			this->mGrid[y][x].pop();
+			this->mGrid[y][x].push(front);
+		}
+	}*/
 
 	// Set left and right borders
 	this->mBorderLeft = (x <= 0) ? BLOCK : this->mGrid[y][x - 1].front();
@@ -259,10 +260,10 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 
 	// Set gravity position
 	for (int i = y; i >= 0; --i) {
-			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
+		if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
 			this->mCamera->SetGravityPosition(i * LANE_HEIGHT + GRAVITY_POS);
-				break;
-			}
+			break;
+		}
 	}
 
 	// Detected collision
@@ -271,16 +272,16 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		this->mGrid[y][x].front() = EMPTY;
 	}
 
-		/*for (int z = 1; z < LANES_Z_COUNT; z++) {
-			for (int y = 0; y < LANES_Y_COUNT; y++) {
-				for (int x = 0; x < LANES_X_COUNT; x++) {
-					GameItem front = this->mGrid[y][x].front();
-					this->mGrid[y][x].pop();
-					this->mGrid[y][x].push(front);
-				}
+	/*for (int z = 1; z < LANES_Z_COUNT; z++) {
+		for (int y = 0; y < LANES_Y_COUNT; y++) {
+			for (int x = 0; x < LANES_X_COUNT; x++) {
+				GameItem front = this->mGrid[y][x].front();
+				this->mGrid[y][x].pop();
+				this->mGrid[y][x].push(front);
 			}
-		}*/
-	}
+		}
+	}*/
+}
 
 /* Executes actions according to different types of collision with game items */
 void Game::Collide(GameItem item) {
