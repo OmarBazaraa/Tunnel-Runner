@@ -78,6 +78,12 @@ const double COIN_SIZE = 0.2;
 const double RING_RADIUS = 0.5;
 const double RING_DEPTH = 0.2;
 
+// Camera constants
+const double GRAVITY_POS = 1.0f;
+const double CAMERA_SPEED_INIT = 4;
+const double CAMERA_JUMP_OFFSET = LANE_HEIGHT * 1.5f;
+const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
+
 // Font constants
 const double FONT_SIZE = 48.0f;
 const double FONT_MARGIN = 25.0f;
@@ -92,11 +98,8 @@ const string SCORE_LABEL = "Score: ";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
 
-// Camera constants
-const double GRAVITY_POS = 1.0f;
-const double CAMERA_SPEED_INIT = 4;
-const double CAMERA_JUMP_OFFSET = LANE_HEIGHT * 1.5f;
-const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
+// Game constants
+const int COIN_VALUE = 1;
 
 
 /*

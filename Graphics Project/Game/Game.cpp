@@ -216,15 +216,15 @@ void Game::ProcessMouseInput() {
 }
 
 /* Detects the collision with the character and returns the colliding item */
-GameItem Game::DetectCollision(glm::vec3 character) {
+GameItem Game::DetectCollision(glm::vec3 characterPos) {
 	GameItem colliding = EMPTY;
 	mColliding.Left = mColliding.Right = BLOCK;
 
-	int x = (character.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
-	int y = (character.y) / LANE_HEIGHT;
+	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
+	int y = (characterPos.y) / LANE_HEIGHT;
 
-	if (character.x - int(character.x / LANE_WIDTH) * LANE_WIDTH) x++;
-	if (character.y - int(character.y / LANE_HEIGHT) * LANE_HEIGHT) y++;
+	if (characterPos.x - int(characterPos.x / LANE_WIDTH) * LANE_WIDTH) x++;
+	if (characterPos.y - int(characterPos.y / LANE_HEIGHT) * LANE_HEIGHT) y++;
 
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
 		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
@@ -271,7 +271,7 @@ void Game::Collide(GameItem collidingItem) {
 		this->mGameState = LOST;
 		break;
 	case COIN:
-		this->mScore++;
+		this->mScore += COIN_VALUE;
 		this->mSoundEngine->play2D("Sounds/Coin.mp3");
 		break;
 	}
