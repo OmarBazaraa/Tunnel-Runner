@@ -37,7 +37,9 @@ const double MIN_YAW = YAW - 45.0f;
 const double MAX_PITCH = 45.0f;
 const double MIN_PITCH = -MAX_PITCH;
 // Animation constants
-const double MOVE_SPEED = 5.0f;
+const double MOVE_SPEED_INIT = 4.0f;
+const double MOVE_SPEED_MAX = 15;
+const double MOVE_ACCELERATION_INIT = 0.01;
 const double JUMP_SPEED = 5.0f;
 const double JUMP_ACCELERATION = 12.5f;			// If you want to jump with a certain height use this EQN => a = (MOVE_SPEED)^2 / (2 * Height)
 const double MOUSE_SENSITIVTY = 5.0f;
@@ -72,6 +74,7 @@ private:
 	bool mIsMovingHorizontalStep;
 	bool mIsMovingForwardStep;
 	double mMoveSpeed;
+	double mMoveAcceleration;
 	double mMoveHorizontalDirection;
 	double mMoveForwardDirection;
 	double mMoveHorizontalOffset;
@@ -105,12 +108,6 @@ public:
 	/* Destructor */
 	~Camera();
 
-	/* Sets the position of the ground/gravity, needed to apply falling effect */
-	void SetGravityPosition(double ypos);
-
-	/* Sets the Camera movement speed with a certain value */
-	void SetMoveSpeed(double speed);
-
 	/* Sets the position of the camera by the given vector */
 	void SetPosition(glm::vec3 position = POSITION);
 
@@ -119,6 +116,18 @@ public:
 
 	/* Returns camera direction in world's coordinates */
 	glm::vec3 GetFront() const;
+
+	/* Sets the position of the ground/gravity, needed to apply falling effect */
+	void SetGravityPosition(double ypos);
+
+	/* Sets the Camera movement speed with a certain value */
+	void SetMoveSpeed(double speed);
+
+	/* Sets the Camera movement acceleration with a certain value */
+	void SetMoveAcceleration(double acceleration);
+
+	/* Increases the camera speed by the given amount */
+	void AccelerateSpeed();
 
 	/* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
 	glm::mat4 GetViewMatrix() const;

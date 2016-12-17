@@ -47,8 +47,9 @@ enum GameState {
 	LOST
 };
 
-
-
+/*
+	
+*/
 struct Borders {
 	GameItem Right, Left;
 };
@@ -93,11 +94,9 @@ const string FPS_LABEL = "FPS: ";
 
 // Camera constants
 const double GRAVITY_POS = 1.0f;
-const double CAMERA_ACCELERATION = 0.01;
 const double CAMERA_SPEED_INIT = 4;
-const double CAMERA_SPEED_MAX = 15;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT * 1.5f;
-const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
+const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
 
 
 /*
@@ -124,19 +123,22 @@ private:
 	// Text renderers
 	TextRenderer* mTextRenderer;
 
-	// Game properties and variables
-	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	// Scene variables
 	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
+	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
 	int mBlockId;
-	int mScore;
+	int mGridIndexZ = 0;
+	int mBlockSliceIdx = 0;
+
+	// Game properties and variables
 	GameState mGameState;
+	Borders mColliding;
+	int mScore;
+	int mGameStartTime;
 	bool mEscReleased = true;
 
 	// Camera
-	double mCameraSpeed = CAMERA_SPEED_INIT;
-	int mZGridIndex = 0, mBlockSliceIdx = 0;
 	Camera* mCamera;
-	Borders mColliding;
 	
 public:
 	/* Constructs a new game with all related objects and components */
@@ -156,23 +158,26 @@ public:
 
 private:
 
-	/* Gets the colliding item with the character */
-	GameItem DetectCollision(glm::vec3 character);
-
-	/* Executes actions according to collision with different game items */
-	void Collide(GameItem collidingItem);
-
 	/* Renders the text of the game */
 	void RenderText();
 
 	/* Processes inputs from keyboard */
 	void ProcessKeyInput();
 
-	/* Processes inputs for the game menu while the game is paused */
-	void ProcessMenuInput();
-
 	/* Processes inputs from mouse */
 	void ProcessMouseInput();
+
+	/* Detects the collision with the character and returns the colliding item */
+	GameItem DetectCollision(glm::vec3 characterPos);
+
+	/* Executes actions according to different types of collision with game items */
+	void Collide(GameItem collidingItem);
+
+	/* Generates all of the scene items */
+	void GenerateSceneItems();
+
+	/* Clears the passed scene items from the grid */
+	void ClearGrid();
 
 	/* Resets the game initial values */
 	void ResetGame();
@@ -189,18 +194,12 @@ private:
 	/* Initializes the game models */
 	void InitModels();
 
-	/* Initializes the game light sources */
-	void InitLightSources();
-
 	/* Initialezies the game blocks */
 	void InitGameBlocks();
 
+	/* Initializes the game light sources */
+	void InitLightSources();
+
 	/* Initializes the game text renderers */
 	void InitTextRenderers();
-
-	/* Generates all of the scene items */
-	void GenerateSceneItems();
-
-	/* Clears the grid queue from extra scenes that will not be drawn */
-	void ClearGrid();
 };

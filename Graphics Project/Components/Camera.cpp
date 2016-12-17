@@ -15,7 +15,8 @@ Camera::Camera(glm::vec3 position, double aspect) {
 	// Horizontal Move
 	this->mIsMovingHorizontalStep = false;
 	this->mIsMovingForwardStep = false;
-	this->mMoveSpeed = MOVE_SPEED;
+	this->mMoveSpeed = MOVE_SPEED_INIT;
+	this->mMoveAcceleration = MOVE_ACCELERATION_INIT;
 	// Jump
 	this->mIsJumping = false;
 	this->mJumpVelocity = JUMP_SPEED;
@@ -44,6 +45,21 @@ Camera::~Camera() {
 	
 }
 
+/* Sets the position of the camera in world space */
+void Camera::SetPosition(glm::vec3 position) {
+	this->mPosition = position;
+}
+
+/* Returns camera position in world's coordinates */
+glm::vec3 Camera::GetPosition() const {
+	return this->mPosition;
+}
+
+/* Returns camera direction in world's coordinates */
+glm::vec3 Camera::GetFront() const {
+	return this->mFront;
+}
+
 /* Sets the position of the ground/gravity, needed to apply falling effect */
 void Camera::SetGravityPosition(double ypos) {
 	if (this->mGroundPosition > ypos && !this->mIsJumping) {
@@ -59,19 +75,18 @@ void Camera::SetMoveSpeed(double speed) {
 	this->mMoveSpeed = speed;
 }
 
-/* Sets the position of the camera in world space */
-void Camera::SetPosition(glm::vec3 position) {
-	this->mPosition = position;
+/* Sets the Camera movement acceleration with a certain value */
+void Camera::SetMoveAcceleration(double acceleration) {
+	this->mMoveAcceleration = acceleration;
 }
 
-/* Returns camera position in world's coordinates */
-glm::vec3 Camera::GetPosition() const {
-	return this->mPosition;
-}
+/* Increases the camera speed by the given amount */
+void Camera::AccelerateSpeed() {
+	this->mMoveSpeed += this->mMoveAcceleration;
 
-/* Returns camera direction in world's coordinates */
-glm::vec3 Camera::GetFront() const {
-	return this->mFront;
+	if (this->mMoveSpeed > MOVE_SPEED_MAX) {
+		this->mMoveSpeed = MOVE_SPEED_MAX;
+	}
 }
 
 /* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
