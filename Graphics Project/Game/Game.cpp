@@ -36,6 +36,7 @@ Game::~Game() {
 	delete this->mCube;
 	delete this->mCoin;
 	delete this->mRing;
+	delete this->mGem;
 
 	// Destroy light sources
 	delete this->mLight;
@@ -157,8 +158,8 @@ void Game::RenderText() {
 	// Time
 	ss.clear();
 	ss.str("");
-	ss << TIME_LABEL << (int)this->mGameTime;
-	x = w - FONT_MARGIN * 8;
+	ss << TIME_LABEL << (int)this->mGameTime / 60 << ";" << (int)this->mGameTime % 60;
+	x = w - FONT_MARGIN * 10;
 	y = h - FONT_MARGIN - FONT_SIZE;
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
 
@@ -306,6 +307,7 @@ void Game::Collide(GameItem item) {
 	{
 	case BLOCK:
 		this->mGameState = LOST;
+		this->mSoundEngine->play2D("Sounds/Gameover2.wav");
 		break;
 	case COIN:
 		this->mScore += this->mCoinValue;
