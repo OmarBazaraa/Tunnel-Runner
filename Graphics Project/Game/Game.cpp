@@ -76,8 +76,6 @@ void Game::Update() {
 	// Populate the game items (mGrid) to be rendered
 	GenerateSceneItems();
 
-
-
 	// Update models
 
 }
@@ -91,7 +89,7 @@ GameItem Game::DetectCollision(glm::vec3 character) {
 	int y = (character.y) / LANE_HEIGHT;
 
 	if (character.x - int(character.x / LANE_WIDTH) * LANE_WIDTH) x++;
-	if (character.y - int(character.y / LANE_HEIGHT) * LANE_HEIGHT)y++;
+	if (character.y - int(character.y / LANE_HEIGHT) * LANE_HEIGHT) y++;
 	
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
 		colliding = this->mGrid[y][x].front();
@@ -169,6 +167,7 @@ void Game::Render() {
 		}
 	}
 
+	// Draw game information
 	this->RenderText();
 }
 
@@ -300,7 +299,7 @@ void Game::ResetGame() {
 	this->mCameraSpeed = CAMERA_SPEED_INIT;
 	this->mZGridIndex = 0;
 	this->mCamera->SetPosition(CAMERA_POSITION);
-	this->mCamera->ResetAnimation();
+	this->mCamera->StopAnimation();
 	this->mBlockSliceIdx = 0;
 	this->mBlockId = 0;
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
