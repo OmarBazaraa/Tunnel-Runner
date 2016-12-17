@@ -253,14 +253,6 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		return;
 	}
 
-		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
-			for (int x = 0; x < LANES_X_COUNT; x++) {
-				GameItem front = this->mGrid[y][x].front();
-				this->mGrid[y][x].pop();
-				this->mGrid[y][x].push(front);
-			}
-		}*/
-
 	// Set left and right borders
 	this->mBorderLeft = (x <= 0) ? BLOCK : this->mGrid[y][x - 1].front();
 	this->mBorderRight = (x + 1 >= LANES_X_COUNT) ? BLOCK : this->mGrid[y][x + 1].front();
