@@ -101,12 +101,7 @@ bool Camera::IsMovingRight() const {
 
 /* Returns whether the camera is jumping */
 bool Camera::IsJumping() const {
-	return this->mIsJumping && this->mJumpVelocity > 0.0f;
-}
-
-/* Returns whether the camera is falling */
-bool Camera::IsFalling() const {
-	return this->mIsJumping && this->mJumpVelocity < 0.0f;
+	return this->mIsJumping;
 }
 
 /* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */

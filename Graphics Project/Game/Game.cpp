@@ -243,10 +243,8 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 	if (x + 1 >= LANES_X_COUNT)
 		this->mBorderRight = BLOCK;
 
-	if (characterPos.x - int(characterPos.x / LANE_WIDTH) * LANE_WIDTH)
-		++x;
-	if (characterPos.y - int(characterPos.y / LANE_HEIGHT) * LANE_HEIGHT)
-		++y;
+	if (this->mCamera->IsMovingRight())++x;
+	if (this->mCamera->IsJumping())++y;
 
 	// Check if out of range
 	if (y < 0 || y >= LANES_Y_COUNT || x < 0 || x >= LANES_X_COUNT || mGrid[y][x].empty()) {
