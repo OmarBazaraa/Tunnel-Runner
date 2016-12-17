@@ -47,14 +47,6 @@ enum GameState {
 	LOST
 };
 
-/*
-	
-*/
-struct Borders {
-	GameItem Right, Left;
-};
-
-
 
 // Forward class declaration
 class GameEngine;
@@ -131,13 +123,14 @@ private:
 	// Scene variables
 	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	GameItem mBorderLeft;
+	GameItem mBorderRight;
 	int mBlockId;
-	int mGridIndexZ = 0;
-	int mBlockSliceIdx = 0;
+	int mGridIndexZ;
+	int mBlockSliceIdx;
 
 	// Game properties and variables
 	GameState mGameState;
-	Borders mColliding;
 	int mScore;
 	int mGameStartTime;
 	bool mEscReleased = true;
@@ -170,7 +163,7 @@ private:
 	void ProcessMouseInput();
 
 	/* Detects the collision with the character and returns the colliding item */
-	GameItem DetectCollision(glm::vec3 characterPos);
+	void DetectCollision(glm::vec3 characterPos);
 
 	/* Executes actions according to different types of collision with game items */
 	void Collide(GameItem collidingItem);
