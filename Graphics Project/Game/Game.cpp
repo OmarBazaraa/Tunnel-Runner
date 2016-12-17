@@ -14,9 +14,6 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitTextRenderers();
 
 	ResetGame();
-
-	mColliding.Right = EMPTY;
-	mColliding.Left = EMPTY;
 }
 
 /* Destructs the game and free resources */
@@ -87,9 +84,14 @@ void Game::Update() {
 
 void Game::Collide(glm::vec3 character) {
 	GameItem colliding;
-	mColliding.Left = mColliding.Right = EMPTY;
-	int x = character.x / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
-	int y = (character.y + LANE_HEIGHT - 0.001f) / LANE_HEIGHT;
+	mColliding.Left = mColliding.Right = BLOCK;
+
+	int x = (character.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
+	int y = (character.y) / LANE_HEIGHT;
+
+	if (character.x - int(character.x / LANE_WIDTH) * LANE_WIDTH) x++;
+	if (character.y - int(character.y / LANE_HEIGHT) * LANE_HEIGHT)y++;
+	
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
 		colliding = this->mGrid[y][x].front();
 
@@ -103,16 +105,14 @@ void Game::Collide(glm::vec3 character) {
 			if (i == 0 || this->mGrid[i - 1][x].front() == BLOCK) {
 				this->mCamera->SetGravityPosition((i + 1)*LANE_HEIGHT);
 				break;
-			}
-		
-		
+			}	
 
 		if (colliding == COIN) {
 			mScore++;
 			this->mGrid[y][x].front() = EMPTY;
 		}
 		else if (colliding == BLOCK) {
-			this->mGameState = LOST;
+ 			this->mGameState = LOST;
 		}
 	}
 }
