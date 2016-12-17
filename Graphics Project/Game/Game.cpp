@@ -5,6 +5,8 @@ Game::Game(GameEngine* engine, const char* title) {
 	this->mEngine = engine;
 	this->mEngine->RegisterGame(this, title);
 
+	srand(time(NULL));
+
 	InitSounds();
 	InitCamera();
 	InitShaders();
@@ -54,6 +56,15 @@ void Game::Update() {
 	if (this->mGameState != RUNNING)
 		return;
 
+	// Removes the double score effect after ceratin amount of time
+	if (this->mDoubleScore) {
+		this->mDoubleScoreTime += this->mEngine->mTimer->ElapsedFramesTime;
+		if (mDoubleScoreTime >= DOUBLE_SCORE_DURATION) {
+			this->mDoubleScore = false;
+			this->mCoinValue /= 2;
+		}
+	}
+
 	// Update camera to give animation effects
 	this->mCamera->MoveStep(FORWARD, LANE_DEPTH);
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
@@ -95,7 +106,7 @@ void Game::Render() {
 				{
 				case BLOCK:
 					this->mCube->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, 0.5f * CUBE_HEIGHT + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
-					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_SIZE, CUBE_HEIGHT, CUBE_DEPTH));
+					this->mCube->ModelMatrix = glm::scale(this->mCube->ModelMatrix, glm::vec3(CUBE_WIDTH, CUBE_HEIGHT, CUBE_DEPTH));
 					this->mCube->Draw(*this->mShader);
 					break;
 				case COIN:
@@ -104,15 +115,11 @@ void Game::Render() {
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
 					break;
-				case SPHERE:
-					this->mSphere->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, SPHERE_RADIUS + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
-					this->mSphere->ModelMatrix = glm::scale(this->mSphere->ModelMatrix, glm::vec3(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS));
-					this->mSphere->Draw(*this->mShader);
-					break;
-				case RING:
-					this->mRing->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, RING_RADIUS + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
-					this->mRing->ModelMatrix = glm::scale(this->mRing->ModelMatrix, glm::vec3(RING_RADIUS, RING_RADIUS, RING_DEPTH));
-					this->mRing->Draw(*this->mShader);
+				case GEM:
+					this->mGem->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - (int)(LANE_WIDTH + 1) / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mGem->ModelMatrix = glm::scale(this->mGem->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
+					this->mGem->ModelMatrix = glm::rotate(this->mGem->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
+					this->mGem->Draw(*this->mShader);
 					break;
 				}
 			}
@@ -279,8 +286,15 @@ void Game::Collide(GameItem collidingItem) {
 		this->mGameState = LOST;
 		break;
 	case COIN:
-		this->mScore += COIN_VALUE;
+		this->mScore += mCoinValue;
 		this->mSoundEngine->play2D("Sounds/Coin.mp3");
+		break;
+	case GEM:
+		this->mDoubleScoreTime = 0;
+		if (!mDoubleScore) {
+			this->mCoinValue *= 2;
+			this->mDoubleScore = true;
+		}
 		break;
 	}
 }
@@ -304,7 +318,16 @@ void Game::GenerateSceneItems() {
 		// fills the queue with the slice items
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+				// don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
+				if (mSceneBlocks[mBlockId][mBlockSliceIdx][y][x] == GEM) {
+					int random = rand() % 20;
+					if (random == 0)
+						this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+					else
+						this->mGrid[y][x].push(COIN);
+				}
+				else
+					this->mGrid[y][x].push(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
 			}
 		}
 
@@ -336,6 +359,8 @@ void Game::ClearGrid() {
 /* Resets the game initial values */
 void Game::ResetGame() {
 	this->mScore = 0;
+	this->mCoinValue = 1;
+	this->mDoubleScore = false;
 	this->mGameStartTime = (int)glfwGetTime();
 	this->mGameState = RUNNING;
 
@@ -371,6 +396,7 @@ void Game::InitModels() {
 	this->mCoin = new Model("Models/coin/coin.obj");
 	this->mSphere = new Model("Models/sphere/sphere.obj");
 	this->mRing = new Model("Models/ring/ring.obj");
+	this->mGem = new Model("Models/gem/gem.obj");
 
 	this->GenerateSceneItems();
 }
@@ -389,7 +415,7 @@ void Game::InitGameBlocks() {
 	for (int b = 0; b < BLOCKS_COUNT; ++b) {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
-				fin >> line;
+				getline(fin, line);
 				// Line is empty or a comment
 				if (line.size() == 0 || line[0] == '#') {
 					x--;
@@ -417,6 +443,7 @@ void Game::InitCamera() {
 	int w, h;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
 	mCamera = new Camera(CAMERA_POSITION_INIT, (double)w / (double)h);
+	mCamera->SetMoveAcceleration(CAMERA_ACCELERATION);
 }
 
 /* Initializes the game light sources */

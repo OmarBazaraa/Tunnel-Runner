@@ -33,8 +33,7 @@ enum GameItem {
 	EMPTY,
 	BLOCK,
 	COIN,
-	SPHERE,
-	RING,
+	GEM,
 	ITEMS_COUNT
 };
 
@@ -62,9 +61,10 @@ const double LANE_DEPTH = 1.5f;
 const double SCENE_WIDTH = LANES_X_COUNT * LANE_WIDTH;
 const double SCENE_HEIGHT = (LANES_Y_COUNT + 2) * LANE_HEIGHT;
 const double SCENE_DEPTH = LANES_Z_COUNT * LANE_DEPTH;
-const double CUBE_SIZE = LANE_WIDTH;
+const double CUBE_WIDTH = LANE_WIDTH;
 const double CUBE_HEIGHT = LANE_HEIGHT;
 const double CUBE_DEPTH = LANE_DEPTH;
+const double GEM_SIZE = 0.6f;
 const double SPHERE_RADIUS = 0.5f;
 const double COIN_SIZE = 0.2;
 const double RING_RADIUS = 0.5;
@@ -74,6 +74,7 @@ const double RING_DEPTH = 0.2;
 const double GRAVITY_POS = 1.0f;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT * 1.5f;
+const double CAMERA_ACCELERATION = 0.1f;
 const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
 
 // Font constants
@@ -91,7 +92,7 @@ const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
 
 // Game constants
-const int COIN_VALUE = 1;
+const double DOUBLE_SCORE_DURATION = 10.0f;
 
 
 /*
@@ -110,6 +111,7 @@ private:
 	Model* mCoin;
 	Model* mCube;
 	Model* mRing;
+	Model* mGem;
 	// Shaders
 	Shader* mShader;
 	Shader* mTextShader;
@@ -132,8 +134,10 @@ private:
 	// Game properties and variables
 	GameState mGameState;
 	int mScore;
+	int mCoinValue = 1;
 	int mGameStartTime;
-	bool mEscReleased = true;
+	double mDoubleScoreTime;
+	bool mEscReleased = true, mDoubleScore;
 
 public:
 	/* Constructs a new game with all related objects and components */
