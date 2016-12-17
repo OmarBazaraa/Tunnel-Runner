@@ -216,17 +216,25 @@ void Game::ProcessMouseInput() {
 }
 
 /* Detects the collision with the character and returns the colliding item */
-GameItem Game::DetectCollision(glm::vec3 characterPos) {
+GameItem Game::DetectCollision(glm::vec3 character) {
 	GameItem colliding = EMPTY;
 	mColliding.Left = mColliding.Right = BLOCK;
 
-	int x = (characterPos.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
-	int y = (characterPos.y) / LANE_HEIGHT;
+	int x = (character.x) / LANE_WIDTH + (LANES_X_COUNT - 1) / 2;
+	int y = (character.y) / LANE_HEIGHT;
 
-	if (characterPos.x - int(characterPos.x / LANE_WIDTH) * LANE_WIDTH) x++;
-	if (characterPos.y - int(characterPos.y / LANE_HEIGHT) * LANE_HEIGHT) y++;
+	if (character.x - int(character.x / LANE_WIDTH) * LANE_WIDTH) x++;
+	if (character.y - int(character.y / LANE_HEIGHT) * LANE_HEIGHT) y++;
 
 	if (y >= 0 && y < LANES_Y_COUNT && x >= 0 && x < LANES_X_COUNT && !mGrid[y][x].empty()) {
+		/*for (int y = 0; y < LANES_Y_COUNT; y++) {
+			for (int x = 0; x < LANES_X_COUNT; x++) {
+				GameItem front = this->mGrid[y][x].front();
+				this->mGrid[y][x].pop();
+				this->mGrid[y][x].push(front);
+			}
+		}*/
+
 		colliding = this->mGrid[y][x].front();
 
 		if (x == 0)mColliding.Left = BLOCK;
@@ -241,6 +249,16 @@ GameItem Game::DetectCollision(glm::vec3 characterPos) {
 				break;
 			}
 		this->mGrid[y][x].front() = EMPTY;
+
+		/*for (int z = 1; z < LANES_Z_COUNT; z++) {
+			for (int y = 0; y < LANES_Y_COUNT; y++) {
+				for (int x = 0; x < LANES_X_COUNT; x++) {
+					GameItem front = this->mGrid[y][x].front();
+					this->mGrid[y][x].pop();
+					this->mGrid[y][x].push(front);
+				}
+			}
+		}*/
 	}
 	return colliding;
 }
@@ -312,17 +330,20 @@ void Game::ResetGame() {
 	this->mScore = 0;
 	this->mGameStartTime = (int)glfwGetTime();
 	this->mGameState = RUNNING;
-	this->mBlockSliceIdx = 0;
-	this->mGridIndexZ = 0;
+
 	this->mCamera->SetPosition(CAMERA_POSITION_INIT);
 	this->mCamera->SetMoveSpeed(CAMERA_SPEED_INIT);
 	this->mCamera->StopAnimation();
-	this->mBlockSliceIdx = 0;
+
 	this->mBlockId = 0;
+	this->mGridIndexZ = 0;
+	this->mBlockSliceIdx = 0;
+	
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
 		for (int x = 0; x < LANES_X_COUNT; ++x) {
-			while (!mGrid[y][x].empty())
+			while (!mGrid[y][x].empty()) {
 				this->mGrid[y][x].pop();
+			}
 		}
 	}
 }
@@ -331,19 +352,6 @@ void Game::ResetGame() {
 void Game::InitSounds() {
 	this->mSoundEngine = createIrrKlangDevice();
 	this->mSoundEngine->play2D("Sounds/Conan.mp3", GL_TRUE);
-}
-
-/* Initializes the game camera */
-void Game::InitCamera() {
-	int w, h;
-	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
-	mCamera = new Camera(CAMERA_POSITION_INIT, (double)w / (double)h);
-}
-
-/* Initializes the game shaders */
-void Game::InitShaders() {
-	this->mShader = new Shader("Shaders/lighting_vertex.shader", "Shaders/lighting_fragment.shader");
-	this->mTextShader = new Shader("Shaders/text_vertex.shader", "Shaders/text_fragment.shader");
 }
 
 /* Initializes the game models */
@@ -386,6 +394,19 @@ void Game::InitGameBlocks() {
 	}
 
 	fin.close();
+}
+
+/* Initializes the game shaders */
+void Game::InitShaders() {
+	this->mShader = new Shader("Shaders/lighting_vertex.shader", "Shaders/lighting_fragment.shader");
+	this->mTextShader = new Shader("Shaders/text_vertex.shader", "Shaders/text_fragment.shader");
+}
+
+/* Initializes the game camera */
+void Game::InitCamera() {
+	int w, h;
+	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
+	mCamera = new Camera(CAMERA_POSITION_INIT, (double)w / (double)h);
 }
 
 /* Initializes the game light sources */

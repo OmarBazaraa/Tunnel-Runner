@@ -109,20 +109,22 @@ private:
 	GameEngine* mEngine;
 	ISoundEngine* mSoundEngine;
 
-	// Shaders
-	Shader* mShader;
-	Shader* mTextShader;
 	// Models
 	Model* mScene;
 	Model* mSphere;
 	Model* mCoin;
 	Model* mCube;
 	Model* mRing;
+	// Shaders
+	Shader* mShader;
+	Shader* mTextShader;
+	// Camera
+	Camera* mCamera;
 	// Light sources
 	LightSource* mLight;
 	// Text renderers
 	TextRenderer* mTextRenderer;
-
+	
 	// Scene variables
 	queue<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
@@ -137,9 +139,6 @@ private:
 	int mGameStartTime;
 	bool mEscReleased = true;
 
-	// Camera
-	Camera* mCamera;
-	
 public:
 	/* Constructs a new game with all related objects and components */
 	Game(GameEngine* engine, const char* title);
@@ -185,17 +184,17 @@ private:
 	/* Initializes the game sounds and background music */
 	void InitSounds();
 
-	/* Initializes the game camera */
-	void InitCamera();
-
-	/* Initializes the game shaders */
-	void InitShaders();
-
 	/* Initializes the game models */
 	void InitModels();
 
 	/* Initialezies the game blocks */
 	void InitGameBlocks();
+
+	/* Initializes the game shaders */
+	void InitShaders();
+
+	/* Initializes the game camera */
+	void InitCamera();
 
 	/* Initializes the game light sources */
 	void InitLightSources();
