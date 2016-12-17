@@ -24,19 +24,6 @@ enum CameraDirection {
 	RIGHT,
 };
 
-/*
-	Defines several camera animation effects
-*/
-enum CameraAnimationType {
-	IDEAL,
-	MOVE_FORWARD,
-	MOVE_BACKWARD,
-	MOVE_LEFT,
-	MOVE_RIGHT,
-	JUMP,
-	FALL
-};
-
 
 // Default camera values
 const glm::vec3 POSITION(0.0f, 0.0f, 0.0f);
@@ -52,7 +39,7 @@ const double MIN_PITCH = -MAX_PITCH;
 // Animation constants
 const double MOVE_SPEED = 5.0f;
 const double JUMP_SPEED = 5.0f;
-const double JUMP_ACCELERATION = 12.5f;						//if you want to jump with a certain height use this EQN => a = (MOVE_SPEED)^2 / (2 * Height)
+const double JUMP_ACCELERATION = 12.5f;			// If you want to jump with a certain height use this EQN => a = (MOVE_SPEED)^2 / (2 * Height)
 const double MOUSE_SENSITIVTY = 5.0f;
 // Camera options
 const double MAX_FOV = 45.0f;
@@ -160,9 +147,8 @@ public:
 	/* Changes the zoom effect of the camera by a certain offset */
 	void Zoom(double offset);
 
-	/* resets all the variables to false for game reset */
-	void ResetAnimation();
-
+	/* Stop any running animation */
+	void StopAnimation();
 
 private:
 	/* Calculates the front vector from the camera's (updated) Eular Angles */

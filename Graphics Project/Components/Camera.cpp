@@ -132,6 +132,7 @@ void Camera::MoveStep(CameraDirection type, double offset) {
 
 /* Starts jumping animation */
 void Camera::Jump(double offset) {
+	// TODO: Force the camera to jump with a certain offset
 	if (!this->mIsJumping) {
 		this->mIsJumping = true;
 		this->mJumpVelocity = JUMP_SPEED;
@@ -244,7 +245,8 @@ void Camera::Zoom(double offset) {
 		this->mFOV = MAX_FOV;
 }
 
-void Camera::ResetAnimation() {
+/* Stop any running animation */
+void Camera::StopAnimation() {
 	this->mIsJumping = false;
 	this->mIsMovingForwardStep = false;
 	this->mIsMovingHorizontalStep = false;
