@@ -28,7 +28,7 @@ using namespace irrklang;
 
 
 /*
-Defines several game items used in filling the game grid
+	Defines several game items used in filling the game grid
 */
 enum GameItem {
 	EMPTY,
@@ -39,7 +39,7 @@ enum GameItem {
 };
 
 /*
-Defines several game states
+	Defines several game states
 */
 enum GameState {
 	RUNNING,
@@ -93,7 +93,7 @@ const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score: ";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
-const string GEM_LABEL = "GEM: ";
+const string GEM_LABEL = "GEM (x2): ";
 
 // Game constants
 const int CHARACTER_OFFSET = 1;
@@ -102,7 +102,7 @@ const double DOUBLE_SCORE_DURATION = 10.0f;
 
 
 /*
-Class containing all our game logic and drawing
+	Class containing all our game logic and drawing
 */
 class Game
 {
@@ -127,7 +127,11 @@ private:
 	LightSource* mLight;
 	// Text renderers
 	TextRenderer* mTextRenderer;
-
+	double mGameTitleLabelWidth;
+	double mGameOverMsgWidth;
+	double mMenuMsgWidth;
+	double mGemLabelWidth;
+	
 	// Scene variables
 	deque<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
@@ -146,7 +150,7 @@ private:
 	double mDoubleScoreTime;
 	bool mDoubleScore;
 	bool mEscReleased = true;
-
+	
 public:
 	/* Constructs a new game with all related objects and components */
 	Game(GameEngine* engine, const char* title);
