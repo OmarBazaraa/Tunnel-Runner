@@ -133,6 +133,7 @@ private:
 	GameState mGameState;
 	int mScore;
 	int mGameStartTime;
+	float mColorValue = 0.0f;
 	bool mEscReleased = true;
 
 public:
@@ -166,7 +167,7 @@ private:
 	void DetectCollision(glm::vec3 characterPos);
 
 	/* Executes actions according to different types of collision with game items */
-	void Collide(GameItem collidingItem);
+	void Collide(GameItem item);
 
 	/* Generates all of the scene items */
 	void GenerateSceneItems();

@@ -59,6 +59,17 @@ void Game::Update() {
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 	
 	// Update light sources
+	this->mColorValue += 0.005f;
+	if (this->mColorValue > 2.5f) {
+		this->mColorValue = 0;
+	}
+	double r = abs(sin(this->mColorValue) / 2.0f) + 0.5f;
+	double g = abs(cos(this->mColorValue) / 2.0f) + 0.5f;
+	double b = abs(tan(this->mColorValue) / 2.0f) + 0.5f;
+	this->mLight->SpecularColor = glm::vec3(r, g, b);
+	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
+	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
+
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
@@ -267,8 +278,8 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 }
 
 /* Executes actions according to different types of collision with game items */
-void Game::Collide(GameItem collidingItem) {
-	switch (collidingItem)
+void Game::Collide(GameItem item) {
+	switch (item)
 	{
 	case BLOCK:
 		this->mGameState = LOST;
