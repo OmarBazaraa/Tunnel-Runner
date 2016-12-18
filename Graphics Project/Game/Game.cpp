@@ -10,8 +10,8 @@ Game::Game(GameEngine* engine, const char* title) {
 	InitSounds();
 	InitCamera();
 	InitShaders();
-	InitModels();
 	InitGameBlocks();
+	InitModels();
 	InitLightSources();
 	InitTextRenderers();
 
@@ -36,7 +36,8 @@ Game::~Game() {
 	delete this->mCube;
 	delete this->mCoin;
 	delete this->mRing;
-	delete this->mGem;
+	delete this->mGemScore;
+	delete this->mGemSpeed;
 
 	// Destroy light sources
 	delete this->mLight;
@@ -73,6 +74,16 @@ void Game::Update() {
 		if (this->mDoubleScoreTime >= DOUBLE_SCORE_DURATION) {
 			this->mDoubleScore = false;
 			this->mCoinValue /= 2;
+		}
+	}
+
+	// Removes the increase speed effect after certain amount of time
+	if (this->mIncreaseSpeed) {
+		this->mIncreaseSpeedTime += this->mEngine->mTimer->ElapsedFramesTime;
+
+		if (this->mIncreaseSpeedTime >= INCREASE_SPEED_DURATION) {
+			this->mIncreaseSpeed = false;
+			this->mCamera->SetMoveSpeed(this->mCamera->GetCameraSpeed() / INCREASE_SPEED_FACTOR);
 		}
 	}
 
@@ -134,11 +145,17 @@ void Game::Render() {
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
 					break;
-				case GEM:
-					this->mGem->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
-					this->mGem->ModelMatrix = glm::scale(this->mGem->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
-					this->mGem->ModelMatrix = glm::rotate(this->mGem->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
-					this->mGem->Draw(*this->mShader);
+				case GEM_SCORE:
+					this->mGemScore->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mGemScore->ModelMatrix = glm::scale(this->mGemScore->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
+					this->mGemScore->ModelMatrix = glm::rotate(this->mGemScore->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
+					this->mGemScore->Draw(*this->mShader);
+					break;
+				case GEM_SPEED:
+					this->mGemSpeed->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mGemSpeed->ModelMatrix = glm::scale(this->mGemSpeed->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
+					this->mGemSpeed->ModelMatrix = glm::rotate(this->mGemSpeed->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
+					this->mGemSpeed->Draw(*this->mShader);
 					break;
 				}
 			}
@@ -177,13 +194,28 @@ void Game::RenderText() {
 	y = FONT_MARGIN;
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
 
-	// Gem percentage
+	// Gem score percentage
 	if (this->mDoubleScore) {
 		ss.clear();
 		ss.str("");
-		ss << GEM_LABEL << (int)(((DOUBLE_SCORE_DURATION - this->mDoubleScoreTime) / DOUBLE_SCORE_DURATION) * 100) << "%";
-		x = (w - this->mGemLabelWidth) / 2;
+		ss << GEM_SCORE_LABEL << (int)(((DOUBLE_SCORE_DURATION - this->mDoubleScoreTime) / DOUBLE_SCORE_DURATION) * 100) << "%";
+		x = (w - this->mGemScoreLabelWidth) / 2;
 		y = h - FONT_MARGIN - FONT_SIZE;
+		this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
+	}
+
+	// Gem speed percentage
+	if (this->mIncreaseSpeed) {
+		ss.clear();
+		ss.str("");
+		ss << GEM_SPEED_LABEL << (int)(((INCREASE_SPEED_DURATION - this->mIncreaseSpeedTime) / INCREASE_SPEED_DURATION) * 100) << "%";
+		x = (w - this->mGemSpeedLabelWidth) / 2;
+		y = h - FONT_MARGIN - FONT_SIZE;
+
+		if (this->mDoubleScore) {
+			y -= FONT_MARGIN * 3;
+		}
+
 		this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
 	}
 
@@ -367,11 +399,19 @@ void Game::Collide(GameItem item) {
 		this->mScore += this->mCoinValue;
 		this->mSoundEngine->play2D("Sounds/coin.mp3");
 		break;
-	case GEM:
+	case GEM_SCORE:
 		this->mDoubleScoreTime = 0;
 		if (!mDoubleScore) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
+		}
+		this->mSoundEngine->play2D("Sounds/coin.mp3");
+		break;
+	case GEM_SPEED:
+		this->mIncreaseSpeedTime = 0;
+		if (!mIncreaseSpeed) {
+			this->mCamera->SetMoveSpeed(this->mCamera->GetCameraSpeed()*INCREASE_SPEED_FACTOR);
+			this->mIncreaseSpeed = true;
 		}
 		this->mSoundEngine->play2D("Sounds/coin.mp3");
 		break;
@@ -387,7 +427,7 @@ void Game::GenerateSceneItems() {
 		// If we consumed the whole block then get a new one
 		if (mBlockSliceIdx >= LANES_Z_COUNT) {
 			// Randomlly get a new game block
-			this->mBlockId = rand() % (BLOCKS_COUNT - 1) + 1;
+			this->mBlockId = rand() % (mBlocksCount - 1) + 1;
 			this->mBlockSliceIdx = 0;
 
 			// Increase camera speed every new block
@@ -398,16 +438,16 @@ void Game::GenerateSceneItems() {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
 				// Don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
-				if (mSceneBlocks[mBlockId][mBlockSliceIdx][y][x] == GEM) {
+				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SPEED) {
 					int random = rand() % 20;
 
 					if (random == 0)
-						this->mGrid[y][x].push_back(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+						this->mGrid[y][x].push_back(mSceneBlocks[mBlockSliceIdx][y][x][mBlockId]);
 					else
 						this->mGrid[y][x].push_back(COIN);
 				}
 				else {
-					this->mGrid[y][x].push_back(mSceneBlocks[mBlockId][mBlockSliceIdx][y][x]);
+					this->mGrid[y][x].push_back(mSceneBlocks[mBlockSliceIdx][y][x][mBlockId]);
 				}
 			}
 		}
@@ -444,6 +484,7 @@ void Game::ResetGame() {
 	this->mGameState = RUNNING;
 	this->mCoinValue = COIN_VALUE;
 	this->mDoubleScore = false;
+	this->mIncreaseSpeed = false;
 
 	this->mCamera->SetPosition(CAMERA_POSITION_INIT);
 	this->mCamera->SetMoveSpeed(CAMERA_SPEED_INIT);
@@ -479,7 +520,8 @@ void Game::InitModels() {
 	this->mCoin = new Model("Models/coin/coin.obj");
 	this->mSphere = new Model("Models/sphere/sphere.obj");
 	this->mRing = new Model("Models/ring/ring.obj");
-	this->mGem = new Model("Models/gem/gem.obj");
+	this->mGemScore = new Model("Models/gem_score/gem_score.obj");
+	this->mGemSpeed = new Model("Models/gem_speed/gem_speed.obj");
 
 	this->GenerateSceneItems();
 }
@@ -493,9 +535,14 @@ void Game::InitGameBlocks() {
 		return;
 	}
 
-	string line;
+	string line = "#";
+	while (line[0] == '#' || line.size() == 0) {
+		getline(fin, line);
+	}
+	mBlocksCount = stoi(line);
 
-	for (int b = 0; b < BLOCKS_COUNT; ++b) {
+
+	for (int b = 0; b < mBlocksCount; ++b) {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
 				getline(fin, line);
@@ -506,7 +553,8 @@ void Game::InitGameBlocks() {
 				}
 
 				for (int z = 0; z < LANES_Z_COUNT; ++z) {
-					mSceneBlocks[b][z][y][x] = (GameItem)(line[z] - '0');
+					mSceneBlocks[z][y][x].resize(mBlocksCount);
+					mSceneBlocks[z][y][x][b] = (GameItem)(line[z] - '0');
 				}
 			}
 		}
@@ -549,5 +597,6 @@ void Game::InitTextRenderers() {
 	this->mGameTitleLabelWidth = this->mTextRenderer->GetTextWidth(GAME_TITLE, TITLE_FONT_SCALE);
 	this->mGameOverMsgWidth = this->mTextRenderer->GetTextWidth(GAME_OVER_MSG, MENU_FONT_SCALE);
 	this->mMenuMsgWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
-	this->mGemLabelWidth = this->mTextRenderer->GetTextWidth(GEM_LABEL + "100%", FONT_SCALE);
+	this->mGemScoreLabelWidth = this->mTextRenderer->GetTextWidth(GEM_SCORE_LABEL + "100%", FONT_SCALE);
+	this->mGemSpeedLabelWidth = this->mTextRenderer->GetTextWidth(GEM_SPEED_LABEL + "100%", FONT_SCALE);
 }

@@ -34,7 +34,8 @@ enum GameItem {
 	EMPTY,
 	BLOCK,
 	COIN,
-	GEM,
+	GEM_SCORE,
+	GEM_SPEED,
 	ITEMS_COUNT
 };
 
@@ -55,7 +56,6 @@ class GameEngine;
 const int LANES_X_COUNT = 3;
 const int LANES_Y_COUNT = 4;
 const int LANES_Z_COUNT = 20;
-const int BLOCKS_COUNT = 5;
 const double LANE_WIDTH = 1.5f;
 const double LANE_HEIGHT = 1.0f;
 const double LANE_DEPTH = 1.5f;
@@ -94,11 +94,14 @@ const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score: ";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
-const string GEM_LABEL = "GEM (x2): ";
+const string GEM_SCORE_LABEL = "GEM (x2): ";
+const string GEM_SPEED_LABEL = "GEM (Speed): ";
 
 // Game constants
 const int COIN_VALUE = 1;
 const double DOUBLE_SCORE_DURATION = 10.0f;
+const double INCREASE_SPEED_DURATION = 10.0f;
+const double INCREASE_SPEED_FACTOR = 1.25f;
 
 // Music constants
 const int BACKGROUND_MUSIC_COUNT = 4;
@@ -126,7 +129,8 @@ private:
 	Model* mCoin;
 	Model* mCube;
 	Model* mRing;
-	Model* mGem;
+	Model* mGemScore;
+	Model* mGemSpeed;
 	// Shaders
 	Shader* mShader;
 	Shader* mTextShader;
@@ -139,17 +143,19 @@ private:
 	double mGameTitleLabelWidth;
 	double mGameOverMsgWidth;
 	double mMenuMsgWidth;
-	double mGemLabelWidth;
+	double mGemScoreLabelWidth;
+	double mGemSpeedLabelWidth;
 	
 	// Scene variables
 	deque<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
-	GameItem mSceneBlocks[BLOCKS_COUNT][LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
+	vector<GameItem> mSceneBlocks[LANES_Z_COUNT][LANES_Y_COUNT][LANES_X_COUNT];
 	GameItem mCharacterGrid[LANES_Y_COUNT][LANES_X_COUNT];
 	GameItem mBorderLeft;
 	GameItem mBorderRight;
 	int mBlockId;
 	int mGridIndexZ;
 	int mBlockSliceIdx;
+	int mBlocksCount;
 
 	// Game properties and variables
 	GameState mGameState;
@@ -157,8 +163,8 @@ private:
 	int mCoinValue;
 	int mMusicIdx = 0;
 	double mGameTime;
-	double mDoubleScoreTime;
-	bool mDoubleScore;
+	double mDoubleScoreTime, mIncreaseSpeedTime;
+	bool mDoubleScore, mIncreaseSpeed;
 	bool mEscReleased = true;
 	
 public:
