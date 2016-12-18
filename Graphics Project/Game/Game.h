@@ -34,8 +34,10 @@ enum GameItem {
 	EMPTY,
 	BLOCK,
 	COIN,
-	GEM_SCORE,
+	GEM_DOUBLE_SCORE,
 	GEM_SPEED,
+	GEM_EXTRA_SCORE,
+	GEM_REVERSED_MODE,
 	ITEMS_COUNT
 };
 
@@ -91,17 +93,22 @@ const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 // Menu constants
 const string MENU_MSG = "Press Q to quit, R to replay";
 const string GAME_OVER_MSG = "Game Over";
-const string SCORE_LABEL = "Score #";
+const string SCORE_LABEL = "Score: ";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
 const string GEM_SCORE_LABEL = "GEM (Score x2): ";
 const string GEM_SPEED_LABEL = "GEM (Speed x1.25): ";
+const string GEM_EXTRA_SCORE_LABEL = "+100";
+const string GEM_REVERSED_MODE_LABEL = "Crazy Mode: ";
 
 // Game constants
 const int COIN_VALUE = 1;
+const int EXTRA_COINS_VALUE = 100;
 const double DOUBLE_SCORE_DURATION = 10.0f;
 const double INCREASE_SPEED_DURATION = 10.0f;
 const double INCREASE_SPEED_FACTOR = 1.25f;
+const double EXTRA_SCORE_DURATION = 2.0f;
+const double DIRECTIONS_REVERSED_DURATION = 10.0f;
 
 // Music constants
 const int BACKGROUND_MUSIC_COUNT = 5;
@@ -144,6 +151,8 @@ private:
 	double mMenuMsgWidth;
 	double mGemScoreLabelWidth;
 	double mGemSpeedLabelWidth;
+	double mExtraScoreLabelWidth;
+	double mReversedLabelWidth;
 	
 	// Scene variables
 	deque<GameItem> mGrid[LANES_Y_COUNT][LANES_X_COUNT];
@@ -163,8 +172,14 @@ private:
 	int mCoinValue;
 	int mMusicIdx = 0;
 	double mGameTime;
-	double mDoubleScoreTime, mIncreaseSpeedTime;
-	bool mDoubleScore, mIncreaseSpeed;
+	double mDoubleScoreTime;
+	double mIncreaseSpeedTime;
+	double mExtraScoreTime;
+	double mDirectionsReversedTime;
+	bool mDoubleScore;
+	bool mIncreaseSpeed;
+	bool mExtraScore;
+	bool mDirectionsReversed;
 	bool mEscReleased = true;
 	
 public:
