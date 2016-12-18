@@ -60,6 +60,12 @@ glm::vec3 Camera::GetFront() const {
 	return this->mFront;
 }
 
+/* Returns the camera movement speed */
+double Camera::GetCameraSpeed() {
+	return this->mMoveSpeed;
+}
+
+
 /* Sets the position of the ground/gravity, needed to apply falling effect */
 void Camera::SetGravityPosition(double ypos) {
 	if (this->mGroundPosition > ypos && !this->mIsJumping) {

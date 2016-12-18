@@ -1,9 +1,14 @@
 #0 => EMPTY
 #1 => CUBE
 #2 => COIN
-#3 => GEM
+#3 => GEM_SCORE
+#4 => GEM_SPEED
 
-#1
+#Blocks Count
+#at least 2 => 1 for initialization and 1 for generation
+5
+
+#1	=> initial block
 
 00000000001111111110
 00000000002222200000
