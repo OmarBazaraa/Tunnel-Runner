@@ -53,6 +53,12 @@ void Game::ProcessInput() {
 
 /* Updates objects' information needed to apply effects on the next frame  */
 void Game::Update() {
+	// Update music
+	if (!this->mSoundEngine->isCurrentlyPlaying(BACKGROUND_MUSIC[this->mMusicIdx].c_str())) {
+		this->mMusicIdx = (this->mMusicIdx + 1) % BACKGROUND_MUSIC_COUNT;
+		this->mSoundEngine->play2D(BACKGROUND_MUSIC[this->mMusicIdx].c_str());
+	}
+
 	// Return if game is not running
 	if (this->mGameState != RUNNING)
 		return;
@@ -463,7 +469,7 @@ void Game::ResetGame() {
 /* Initializes the game sounds and background music */
 void Game::InitSounds() {
 	this->mSoundEngine = createIrrKlangDevice();
-	this->mSoundEngine->play2D("Sounds/undefeated.mp3", GL_TRUE);
+	this->mSoundEngine->play2D(BACKGROUND_MUSIC[0].c_str(), GL_TRUE);
 }
 
 /* Initializes the game models */
@@ -519,7 +525,8 @@ void Game::InitShaders() {
 void Game::InitCamera() {
 	int w, h;
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
-	mCamera = new Camera(CAMERA_POSITION_INIT, (double)w / (double)h);
+	this->mCamera = new Camera(CAMERA_POSITION_INIT, (double)w / (double)h);
+	this->mCamera->SetMoveAcceleration(CAMERA_ACCELERATION);
 }
 
 /* Initializes the game light sources */

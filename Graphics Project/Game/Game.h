@@ -76,7 +76,7 @@ const double GRAVITY_POS = LANE_HEIGHT;
 const double CHARACTER_OFFSET = LANE_DEPTH * 1.5;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT;
-const double CAMERA_ACCELERATION = 0.1f;
+const double CAMERA_ACCELERATION = 0.05f;
 const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
 
 // Font constants
@@ -99,6 +99,15 @@ const string GEM_LABEL = "GEM (x2): ";
 // Game constants
 const int COIN_VALUE = 1;
 const double DOUBLE_SCORE_DURATION = 10.0f;
+
+// Music constants
+const int BACKGROUND_MUSIC_COUNT = 4;
+const string BACKGROUND_MUSIC[] = {
+	"Sounds/casino_challenge.mp3",
+	"Sounds/the_game_changer.mp3",
+	"Sounds/undefeated.mp3",
+	"Sounds/worm_tunnel.mp3"
+};
 
 
 /*
@@ -146,6 +155,7 @@ private:
 	GameState mGameState;
 	int mScore;
 	int mCoinValue;
+	int mMusicIdx = 0;
 	double mGameTime;
 	double mDoubleScoreTime;
 	bool mDoubleScore;
