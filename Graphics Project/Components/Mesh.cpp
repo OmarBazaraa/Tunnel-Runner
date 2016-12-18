@@ -19,18 +19,6 @@ Mesh::~Mesh() {
 	glDeleteBuffers(1, &this->VBO);
 	glDeleteBuffers(1, &this->EBO);
 	glDeleteVertexArrays(1, &this->VAO);
-
-	this->VAO = -1;
-	this->VBO = -1;
-	this->EBO = -1;
-
-	// Release textures data
-	/*for (unsigned int i = 0; i < this->mTextures.size(); ++i) {
-		if (this->mTextures[i] != NULL) {
-			delete this->mTextures[i];
-			this->mTextures[i] = NULL;
-		}
-	}*/
 }
 
 /* Render the mesh */

@@ -38,6 +38,7 @@ enum GameItem {
 	ITEMS_COUNT
 };
 
+
 /*
 	Defines several game states
 */
@@ -84,14 +85,13 @@ const double FONT_SIZE = 48.0f;
 const double FONT_MARGIN = 25.0f;
 const double FONT_SCALE = 1.0f;
 const double MENU_FONT_SCALE = 0.6f;
-const double TITLE_FONT_SCALE = 1.2f;
+const double TITLE_FONT_SCALE = 1.6f;
 const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 
 // Menu constants
-const string GAME_TITLE = "Tunnel Runner";
 const string MENU_MSG = "Press Q to quit, R to replay";
 const string GAME_OVER_MSG = "Game Over";
-const string SCORE_LABEL = "Score: ";
+const string SCORE_LABEL = "Score #";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
 const string GEM_LABEL = "GEM (x2): ";
@@ -101,12 +101,13 @@ const int COIN_VALUE = 1;
 const double DOUBLE_SCORE_DURATION = 10.0f;
 
 // Music constants
-const int BACKGROUND_MUSIC_COUNT = 4;
+const int BACKGROUND_MUSIC_COUNT = 5;
 const string BACKGROUND_MUSIC[] = {
-	"Sounds/casino_challenge.mp3",
 	"Sounds/the_game_changer.mp3",
+	"Sounds/casino_challenge.mp3",
 	"Sounds/undefeated.mp3",
-	"Sounds/worm_tunnel.mp3"
+	"Sounds/worm_tunnel.mp3",
+	"Sounds/conan.mp3"
 };
 
 
@@ -122,10 +123,8 @@ private:
 
 	// Models
 	Model* mScene;
-	Model* mSphere;
-	Model* mCoin;
 	Model* mCube;
-	Model* mRing;
+	Model* mCoin;
 	Model* mGem;
 	// Shaders
 	Shader* mShader;
@@ -152,6 +151,7 @@ private:
 	int mBlockSliceIdx;
 
 	// Game properties and variables
+	string mGameTitle;
 	GameState mGameState;
 	int mScore;
 	int mCoinValue;
@@ -167,6 +167,9 @@ public:
 
 	/* Destructs the game and free resources */
 	~Game();
+
+	/* Returns the current game state */
+	GameState GetGameState() const;
 
 	/* Receives user input and processes it for the next frame */
 	void ProcessInput();
@@ -189,7 +192,7 @@ private:
 	void ProcessMouseInput();
 
 	/* Detects the collision with the character and returns the colliding item */
-	void DetectCollision(glm::vec3 characterPos/*, GameItem** grid*/);
+	void DetectCollision(glm::vec3 characterPos);
 
 	/* Gets a slice from the game grid at certain offset in Z lanes*/
 	void GetSlice(int idx);

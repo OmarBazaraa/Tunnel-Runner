@@ -16,6 +16,12 @@ Model::~Model() {
 			this->mMeshes[i] = NULL;
 		}
 	}
+
+	// Release model textures
+	while (!this->mLoadedTextures.empty()) {
+		delete this->mLoadedTextures.begin()->second;
+		this->mLoadedTextures.erase(this->mLoadedTextures.begin());
+	}
 }
 
 /* Draws the model, and thus all its meshes */

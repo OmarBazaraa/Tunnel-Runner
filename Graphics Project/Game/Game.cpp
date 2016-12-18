@@ -4,6 +4,7 @@
 Game::Game(GameEngine* engine, const char* title) {
 	this->mEngine = engine;
 	this->mEngine->RegisterGame(this, title);
+	this->mGameTitle = title;
 
 	srand(time(NULL));
 
@@ -32,10 +33,8 @@ Game::~Game() {
 
 	// Destroy models
 	delete this->mScene;
-	delete this->mSphere;
-	delete this->mCube;
 	delete this->mCoin;
-	delete this->mRing;
+	delete this->mCube;
 	delete this->mGem;
 
 	// Destroy light sources
@@ -43,6 +42,11 @@ Game::~Game() {
 
 	// Destroy text renderers
 	delete this->mTextRenderer;
+}
+
+/* Returns the current game state */
+GameState Game::GetGameState() const {
+	return this->mGameState;
 }
 
 /* Receives user input and processes it for the next frame */
@@ -164,7 +168,18 @@ void Game::RenderText() {
 	// Time
 	ss.clear();
 	ss.str("");
-	ss << TIME_LABEL << (int)this->mGameTime / 60 << ";" << (int)this->mGameTime % 60;
+	int m = (int)this->mGameTime / 60;
+	int s = (int)this->mGameTime % 60;
+
+	ss << TIME_LABEL;
+
+	if (m < 10)
+		ss << 0;
+	ss << m << ".";
+	if (s < 10)
+		ss << 0;
+	ss << s;
+
 	x = w - FONT_MARGIN * 10;
 	y = h - FONT_MARGIN - FONT_SIZE;
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
@@ -199,7 +214,7 @@ void Game::RenderText() {
 		// Title
 		x = (w - this->mGameTitleLabelWidth) / 2;
 		y = h / 2 - FONT_SIZE * TITLE_FONT_SCALE + FONT_MARGIN * 7;
-		this->mTextRenderer->RenderText(*this->mTextShader, GAME_TITLE, x, y, TITLE_FONT_SCALE, FONT_COLOR);
+		this->mTextRenderer->RenderText(*this->mTextShader, this->mGameTitle, x, y, TITLE_FONT_SCALE, FONT_COLOR);
 
 		// Quit and replay
 		x = (w - mMenuMsgWidth) / 2;
@@ -373,7 +388,7 @@ void Game::Collide(GameItem item) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
 		}
-		this->mSoundEngine->play2D("Sounds/coin.mp3");
+		this->mSoundEngine->play2D("Sounds/gem.wav");
 		break;
 	}
 }
@@ -469,7 +484,7 @@ void Game::ResetGame() {
 /* Initializes the game sounds and background music */
 void Game::InitSounds() {
 	this->mSoundEngine = createIrrKlangDevice();
-	this->mSoundEngine->play2D(BACKGROUND_MUSIC[0].c_str(), GL_TRUE);
+	this->mSoundEngine->play2D(BACKGROUND_MUSIC[0].c_str());
 }
 
 /* Initializes the game models */
@@ -477,8 +492,6 @@ void Game::InitModels() {
 	this->mScene = new Model("Models/scene/scene.obj");
 	this->mCube = new Model("Models/cube/cube.obj");
 	this->mCoin = new Model("Models/coin/coin.obj");
-	this->mSphere = new Model("Models/sphere/sphere.obj");
-	this->mRing = new Model("Models/ring/ring.obj");
 	this->mGem = new Model("Models/gem/gem.obj");
 
 	this->GenerateSceneItems();
@@ -546,7 +559,7 @@ void Game::InitTextRenderers() {
 	glfwGetWindowSize(this->mEngine->mWind, &w, &h);
 	this->mTextRenderer = new TextRenderer("Fonts/nickname.ttf", FONT_SIZE, w, h);
 
-	this->mGameTitleLabelWidth = this->mTextRenderer->GetTextWidth(GAME_TITLE, TITLE_FONT_SCALE);
+	this->mGameTitleLabelWidth = this->mTextRenderer->GetTextWidth(this->mGameTitle, TITLE_FONT_SCALE);
 	this->mGameOverMsgWidth = this->mTextRenderer->GetTextWidth(GAME_OVER_MSG, MENU_FONT_SCALE);
 	this->mMenuMsgWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
 	this->mGemLabelWidth = this->mTextRenderer->GetTextWidth(GEM_LABEL + "100%", FONT_SCALE);
