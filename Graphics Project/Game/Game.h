@@ -63,7 +63,7 @@ const double LANE_WIDTH = 1.5f;
 const double LANE_HEIGHT = 1.0f;
 const double LANE_DEPTH = 1.5f;
 const double SCENE_WIDTH = LANES_X_COUNT * LANE_WIDTH;
-const double SCENE_HEIGHT = (LANES_Y_COUNT + 2) * LANE_HEIGHT;
+const double SCENE_HEIGHT = (LANES_Y_COUNT + 3) * LANE_HEIGHT;
 const double SCENE_DEPTH = LANES_Z_COUNT * LANE_DEPTH;
 const double CUBE_WIDTH = LANE_WIDTH;
 const double CUBE_HEIGHT = LANE_HEIGHT;
@@ -79,7 +79,7 @@ const double GRAVITY_POS = LANE_HEIGHT;
 const double CHARACTER_OFFSET = LANE_DEPTH * 1.5;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT;
-const double CAMERA_ACCELERATION = 5.0f;
+const double CAMERA_ACCELERATION = 0.01f;
 const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
 
 // Font constants
@@ -137,6 +137,7 @@ private:
 	Model* mCoin;
 	Model* mGemScore;
 	Model* mGemSpeed;
+	Model* mGemCrazy;
 	// Shaders
 	Shader* mShader;
 	Shader* mTextShader;

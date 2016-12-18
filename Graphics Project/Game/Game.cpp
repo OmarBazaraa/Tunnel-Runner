@@ -37,6 +37,7 @@ Game::~Game() {
 	delete this->mCoin;
 	delete this->mGemScore;
 	delete this->mGemSpeed;
+	delete this->mGemCrazy;
 
 	// Destroy light sources
 	delete this->mLight;
@@ -106,6 +107,9 @@ void Game::Update() {
 
 		if (this->mDirectionsReversedTime >= DIRECTIONS_REVERSED_DURATION) {
 			this->mDirectionsReversed = false;
+			this->mLight->SpecularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+			this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
+			this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
 		}
 	}
 
@@ -115,12 +119,12 @@ void Game::Update() {
 
 	// Update light sources
 	if (this->mDirectionsReversed) {
-	double r = abs(sin(this->mGameTime) / 2.0f) + 0.5f;
-	double g = abs(cos(this->mGameTime) / 2.0f) + 0.5f;
-	double b = 1.0f;// abs(tan(this->mGameTime) / 2.0f) + 0.5f;
-	this->mLight->SpecularColor = glm::vec3(r, g, b);
-	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
-	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
+		double r = abs(sin(this->mGameTime) / 2.0f) + 0.5f;
+		double g = abs(cos(this->mGameTime) / 2.0f) + 0.5f;
+		double b = 1.0f;// abs(tan(this->mGameTime) / 2.0f) + 0.5f;
+		this->mLight->SpecularColor = glm::vec3(r, g, b);
+		this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
+		this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
 	}
 	
 	this->mLight->Position = this->mCamera->GetPosition();
@@ -179,6 +183,13 @@ void Game::Render() {
 					this->mGemSpeed->ModelMatrix = glm::scale(this->mGemSpeed->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
 					this->mGemSpeed->ModelMatrix = glm::rotate(this->mGemSpeed->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mGemSpeed->Draw(*this->mShader);
+					break;
+				case GEM_EXTRA_SCORE:
+				case GEM_REVERSED_MODE:
+					this->mGemCrazy->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
+					this->mGemCrazy->ModelMatrix = glm::scale(this->mGemCrazy->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
+					this->mGemCrazy->ModelMatrix = glm::rotate(this->mGemCrazy->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
+					this->mGemCrazy->Draw(*this->mShader);
 					break;
 				}
 			}
@@ -502,11 +513,19 @@ void Game::GenerateSceneItems() {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
 				// Don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
-				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_DOUBLE_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SPEED) {
-					int random = rand() % 1;
+				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_DOUBLE_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SPEED || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_EXTRA_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_REVERSED_MODE) {
+					int random = rand() % 10;
 
-					if (random == 0)
+					if (random == 0) {
+						if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_EXTRA_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_REVERSED_MODE) {
+							int random2 = rand() % 2;
+							if (random2 == 0)
+								mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] = GEM_EXTRA_SCORE;
+							else
+								mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] = GEM_REVERSED_MODE;
+						}
 						this->mGrid[y][x].push_back(mSceneBlocks[mBlockSliceIdx][y][x][mBlockId]);
+					}
 					else
 						this->mGrid[y][x].push_back(COIN);
 				}
@@ -590,6 +609,7 @@ void Game::InitModels() {
 	this->mCoin = new Model("Models/coin/coin.obj");
 	this->mGemScore = new Model("Models/gem_score/gem_score.obj");
 	this->mGemSpeed = new Model("Models/gem_speed/gem_speed.obj");
+	this->mGemCrazy = new Model("Models/gem_crazy/gem_crazy.obj");
 
 	this->GenerateSceneItems();
 }
