@@ -94,8 +94,8 @@ const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score #";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
-const string GEM_SCORE_LABEL = "GEM (x2): ";
-const string GEM_SPEED_LABEL = "GEM (Speed): ";
+const string GEM_SCORE_LABEL = "GEM (Score x2): ";
+const string GEM_SPEED_LABEL = "GEM (Speed x1.25): ";
 
 // Game constants
 const int COIN_VALUE = 1;
@@ -128,8 +128,6 @@ private:
 	Model* mScene;
 	Model* mCube;
 	Model* mCoin;
-	Model* mCube;
-	Model* mRing;
 	Model* mGemScore;
 	Model* mGemSpeed;
 	// Shaders

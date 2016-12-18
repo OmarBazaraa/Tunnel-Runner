@@ -33,8 +33,8 @@ Game::~Game() {
 
 	// Destroy models
 	delete this->mScene;
+	delete this->mCube;
 	delete this->mCoin;
-	delete this->mRing;
 	delete this->mGemScore;
 	delete this->mGemSpeed;
 
@@ -190,11 +190,9 @@ void Game::RenderText() {
 
 	ss << TIME_LABEL;
 
-	if (m < 10)
-		ss << 0;
+	if (m < 10) ss << 0;
 	ss << m << ".";
-	if (s < 10)
-		ss << 0;
+	if (s < 10) ss << 0;
 	ss << s;
 
 	x = w - FONT_MARGIN * 10;
@@ -533,8 +531,6 @@ void Game::InitModels() {
 	this->mScene = new Model("Models/scene/scene.obj");
 	this->mCube = new Model("Models/cube/cube.obj");
 	this->mCoin = new Model("Models/coin/coin.obj");
-	this->mSphere = new Model("Models/sphere/sphere.obj");
-	this->mRing = new Model("Models/ring/ring.obj");
 	this->mGemScore = new Model("Models/gem_score/gem_score.obj");
 	this->mGemSpeed = new Model("Models/gem_speed/gem_speed.obj");
 
