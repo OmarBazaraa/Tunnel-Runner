@@ -85,6 +85,7 @@ private:
 	double mJumpVelocity;
 	double mJumpAcceleration;
 	double mGroundPosition;
+	double mJumpStartHeight;
 	// Look around
 	double mMouseSensitivity;
 
@@ -115,6 +116,9 @@ public:
 	/* Returns camera direction in world's coordinates */
 	glm::vec3 GetFront() const;
 
+	/* Returns the camera movement speed */
+	double Camera::GetCameraSpeed();
+
 	/* Sets the position of the ground/gravity, needed to apply falling effect */
 	void SetGravityPosition(double ypos);
 
@@ -135,6 +139,9 @@ public:
 
 	/* Returns whether the camera is jumping */
 	bool IsJumping() const;
+
+	/* Returns height from jumping start position */
+	double JumpingOffset() const;
 
 	/* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
 	glm::mat4 GetViewMatrix() const;
