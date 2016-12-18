@@ -39,7 +39,7 @@ const double MIN_PITCH = -MAX_PITCH;
 // Animation constants
 const double MOVE_SPEED_INIT = 4.0f;
 const double MOVE_SPEED_MAX = 15.0f;
-const double MOVE_ACCELERATION_INIT = 0.01;
+const double MOVE_ACCELERATION_INIT = 0.01f;
 const double JUMP_SPEED = 4.0f;
 const double JUMP_ACCELERATION = 12.0f;			// If you want to jump with a certain height use this EQN => a = (MOVE_SPEED)^2 / (2 * Height)
 const double MOUSE_SENSITIVTY = 5.0f;
@@ -117,7 +117,7 @@ public:
 	glm::vec3 GetFront() const;
 
 	/* Returns the camera movement speed */
-	double Camera::GetCameraSpeed();
+	double GetCameraSpeed();
 
 	/* Sets the position of the ground/gravity, needed to apply falling effect */
 	void SetGravityPosition(double ypos);
