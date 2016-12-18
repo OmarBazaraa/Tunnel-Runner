@@ -239,7 +239,7 @@ void Game::ProcessKeyInput() {
 		this->mCamera->MoveStep(RIGHT, LANE_WIDTH);
 
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		if (!this->mCamera->IsJumping()) {
+		if (!this->mCamera->JumpingOffset()) {
 			this->mSoundEngine->play2D("Sounds/Jump.wav");
 		}
 
@@ -273,7 +273,7 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 
 	if (this->mCamera->IsMovingRight())
 		++x;
-	if (this->mCamera->IsJumping() && this->mCamera->IsJumping() < LANE_HEIGHT && y + 1 < LANES_Y_COUNT)
+	if (this->mCamera->IsJumping() && this->mCamera->JumpingOffset() < LANE_HEIGHT)
 		++y;
 
 	// Check if out of range

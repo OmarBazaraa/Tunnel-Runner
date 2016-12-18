@@ -85,6 +85,7 @@ private:
 	double mJumpVelocity;
 	double mJumpAcceleration;
 	double mGroundPosition;
+	double mJumpStartHeight;
 	// Look around
 	double mMouseSensitivity;
 
@@ -134,7 +135,10 @@ public:
 	bool IsMovingRight() const;
 
 	/* Returns whether the camera is jumping */
-	double IsJumping() const;
+	bool IsJumping() const;
+
+	/* Returns height from jumping start position */
+	double JumpingOffset() const;
 
 	/* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
 	glm::mat4 GetViewMatrix() const;

@@ -22,6 +22,7 @@ Camera::Camera(glm::vec3 position, double aspect) {
 	this->mJumpVelocity = JUMP_SPEED;
 	this->mJumpAcceleration = JUMP_ACCELERATION;
 	this->mGroundPosition = position.y;
+	this->mJumpStartHeight = position.y;
 	// Look around
 	this->mMouseSensitivity = MOUSE_SENSITIVTY;
 
@@ -65,6 +66,7 @@ void Camera::SetGravityPosition(double ypos) {
 	if (this->mGroundPosition > ypos && !this->mIsJumping) {
 		this->mJumpVelocity = 0.0f;
 		this->mIsJumping = true;
+		this->mJumpStartHeight = this->mPosition.y;
 	}
 
 	this->mGroundPosition = ypos;
@@ -100,8 +102,13 @@ bool Camera::IsMovingRight() const {
 }
 
 /* Returns whether the camera is jumping */
-double Camera::IsJumping() const {
-	return this->mPosition.y - this->mGroundPosition;
+bool Camera::IsJumping() const {
+	return this->mIsJumping && this->mJumpVelocity > 0.0f;
+}
+
+/* Returns height from gravity */
+double Camera::JumpingOffset() const {
+	return this->mPosition.y - this->mJumpStartHeight;
 }
 
 /* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
@@ -166,6 +173,7 @@ void Camera::Jump(double offset) {
 	if (!this->mIsJumping) {
 		this->mIsJumping = true;
 		this->mJumpVelocity = std::sqrt(2 * JUMP_ACCELERATION * offset);
+		this->mJumpStartHeight = this->mPosition.y;
 	}
 }
 
