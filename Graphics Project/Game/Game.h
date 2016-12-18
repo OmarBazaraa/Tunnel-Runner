@@ -94,6 +94,7 @@ const glm::vec3 FONT_COLOR = glm::vec3(0.5, 0.8f, 0.2f);
 const string MENU_MSG = "Press Q to quit, R to replay";
 const string GAME_OVER_MSG = "Game Over";
 const string SCORE_LABEL = "Score: ";
+const string HIGHSCORE_LABEL = "Highscore: ";
 const string TIME_LABEL = "Time: ";
 const string FPS_LABEL = "FPS: ";
 const string GEM_SCORE_LABEL = "GEM (Score x2): ";
@@ -170,6 +171,7 @@ private:
 	string mGameTitle;
 	GameState mGameState;
 	int mScore;
+	int mHighScore;
 	int mCoinValue;
 	int mMusicIdx = 0;
 	double mGameTime;
@@ -233,6 +235,12 @@ private:
 
 	/* Resets the game initial values */
 	void ResetGame();
+
+	/* Saves the high score in a file */
+	void SaveHighScore();
+
+	/* Reads the high score from the file */
+	int ReadHighScore();
 
 	/* Initializes the game sounds and background music */
 	void InitSounds();

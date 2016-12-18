@@ -212,6 +212,15 @@ void Game::RenderText() {
 	y = h - FONT_MARGIN - FONT_SIZE;
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
 
+	// High score
+	ss.clear();
+	ss.str("");
+	ss << HIGHSCORE_LABEL << this->mHighScore;
+	x = FONT_MARGIN;
+	y = h - FONT_MARGIN * 3 - FONT_SIZE;
+	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
+
+
 	// Time
 	ss.clear();
 	ss.str("");
@@ -458,6 +467,7 @@ void Game::Collide(GameItem item) {
 	case BLOCK:
 		this->mGameState = LOST;
 		this->mSoundEngine->play2D("Sounds/game_over.mp3");
+		this->SaveHighScore();
 		break;
 	case COIN:
 		this->mScore += this->mCoinValue;
@@ -563,6 +573,7 @@ void Game::ClearGrid() {
 /* Resets the game initial values */
 void Game::ResetGame() {
 	this->mScore = 0;
+	this->mHighScore = this->ReadHighScore();
 	this->mGameTime = 0;
 	this->mGameState = RUNNING;
 	this->mCoinValue = COIN_VALUE;
@@ -594,6 +605,40 @@ void Game::ResetGame() {
 			}
 		}
 	}
+}
+
+/* Saves the high score in a file */
+void Game::SaveHighScore() {
+	if (this->mScore < this->mHighScore) {
+		return;
+	}
+
+	ofstream fout("highscore.txt");
+
+	if (!fout.is_open()) {
+		std::cout << "GAME::ERROR: Unable to update highscore" << std::endl;
+		return;
+	}
+
+	fout << this->mScore;
+	fout.close();
+}
+
+/* Reads the high score from the file */
+int Game::ReadHighScore() {
+	ifstream fin("highscore.txt");
+
+	// Failed to find high score file
+	if (!fin.is_open()) {
+		std::cout << "GAME::ERROR: Unable to load highscore" << std::endl;
+		return -1;
+	}
+
+	int score = 0;
+	fin >> score;
+	fin.close();
+
+	return score;
 }
 
 /* Initializes the game sounds and background music */
