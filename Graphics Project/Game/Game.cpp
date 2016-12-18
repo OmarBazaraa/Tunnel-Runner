@@ -91,19 +91,38 @@ void Game::Update() {
 		}
 	}
 
+	// Update extra coins time
+	if (this->mExtraScore) {
+		this->mExtraScoreTime += this->mEngine->mTimer->ElapsedFramesTime;
+
+		if (this->mExtraScoreTime >= EXTRA_SCORE_DURATION) {
+			this->mExtraScore = false;
+		}
+	}
+
+	// Update reversed directions effect
+	if (this->mDirectionsReversed) {
+		this->mDirectionsReversedTime += this->mEngine->mTimer->ElapsedFramesTime;
+
+		if (this->mDirectionsReversedTime >= DIRECTIONS_REVERSED_DURATION) {
+			this->mDirectionsReversed = false;
+		}
+	}
+
 	// Update camera to give animation effects
 	this->mCamera->MoveStep(FORWARD, LANE_DEPTH);
 	this->mCamera->Update(this->mEngine->mTimer->ElapsedFramesTime);
 
 	// Update light sources
-	/*
-	double r = abs(sin(this->mGameTime) / 2.0f) + 0.5f;
-	double g = abs(cos(this->mGameTime) / 2.0f) + 0.5f;
-	double b = 1.0f;// abs(tan(this->mGameTime) / 2.0f) + 0.5f;
-	this->mLight->SpecularColor = glm::vec3(r, g, b);
-	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
-	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
-	*/
+	if (this->mDirectionsReversed) {
+		double r = abs(sin(this->mGameTime) / 2.0f) + 0.5f;
+		double g = abs(cos(this->mGameTime) / 2.0f) + 0.5f;
+		double b = 1.0f;// abs(tan(this->mGameTime) / 2.0f) + 0.5f;
+		this->mLight->SpecularColor = glm::vec3(r, g, b);
+		this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
+		this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
+	}
+	
 	this->mLight->Position = this->mCamera->GetPosition();
 	this->mLight->Position -= this->mCamera->GetFront();
 
@@ -149,7 +168,7 @@ void Game::Render() {
 					this->mCoin->ModelMatrix = glm::rotate(this->mCoin->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
 					this->mCoin->Draw(*this->mShader);
 					break;
-				case GEM_SCORE:
+				case GEM_DOUBLE_SCORE:
 					this->mGemScore->ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - LANES_X_COUNT / 2) * LANE_WIDTH, GEM_SIZE + y * LANE_HEIGHT, -(z + mGridIndexZ) * LANE_DEPTH));
 					this->mGemScore->ModelMatrix = glm::scale(this->mGemScore->ModelMatrix, glm::vec3(GEM_SIZE, GEM_SIZE, GEM_SIZE));
 					this->mGemScore->ModelMatrix = glm::rotate(this->mGemScore->ModelMatrix, (float)this->mEngine->mTimer->CurrentFrameTime, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -232,6 +251,25 @@ void Game::RenderText() {
 		this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
 	}
 
+	// Extra score gift
+	if (this->mExtraScore) {
+		x = (w - this->mExtraScoreLabelWidth) / 2;
+		y = h / 2;
+
+		this->mTextRenderer->RenderText(*this->mTextShader, GEM_EXTRA_SCORE_LABEL, x, y, FONT_SCALE, FONT_COLOR);
+	}
+
+	// Directions reversed percentage
+	if (this->mDirectionsReversed) {
+		ss.clear();
+		ss.str("");
+		ss << GEM_REVERSED_MODE_LABEL << (int)(((DIRECTIONS_REVERSED_DURATION - this->mDirectionsReversedTime) / DIRECTIONS_REVERSED_DURATION) * 100) << "%";
+		x = (w - this->mReversedLabelWidth) / 2;
+		y = FONT_MARGIN + FONT_SIZE;
+
+		this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
+	}
+
 	// Game over label
 	if (this->mGameState == LOST) {
 		x = (w - this->mGameOverMsgWidth) / 2;
@@ -278,10 +316,10 @@ void Game::ProcessKeyInput() {
 		return;
 
 	// Game control
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS && mBorderLeft != BLOCK)
-		this->mCamera->MoveStep(LEFT, LANE_WIDTH);
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS && mBorderRight != BLOCK)
-		this->mCamera->MoveStep(RIGHT, LANE_WIDTH);
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS && (this->mDirectionsReversed ? mBorderRight : mBorderLeft) != BLOCK)
+		this->mCamera->MoveStep(this->mDirectionsReversed ? RIGHT : LEFT, LANE_WIDTH);
+	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS && (this->mDirectionsReversed ? mBorderLeft : mBorderRight) != BLOCK)
+		this->mCamera->MoveStep(this->mDirectionsReversed ? LEFT : RIGHT, LANE_WIDTH);
 
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		if (!this->mCamera->JumpingOffset()) {
@@ -412,8 +450,8 @@ void Game::Collide(GameItem item) {
 		this->mScore += this->mCoinValue;
 		this->mSoundEngine->play2D("Sounds/coin.mp3");
 		break;
-	case GEM_SCORE:
-		this->mDoubleScoreTime = 0;
+	case GEM_DOUBLE_SCORE:
+		this->mDoubleScoreTime = 0.0f;
 		if (!mDoubleScore) {
 			this->mCoinValue *= 2;
 			this->mDoubleScore = true;
@@ -421,12 +459,23 @@ void Game::Collide(GameItem item) {
 		this->mSoundEngine->play2D("Sounds/gem.wav");
 		break;
 	case GEM_SPEED:
-		this->mIncreaseSpeedTime = 0;
+		this->mIncreaseSpeedTime = 0.0f;
 		if (!mIncreaseSpeed) {
-			this->mCamera->SetMoveSpeed(this->mCamera->GetCameraSpeed()*INCREASE_SPEED_FACTOR);
+			this->mCamera->SetMoveSpeed(this->mCamera->GetCameraSpeed() * INCREASE_SPEED_FACTOR);
 			this->mIncreaseSpeed = true;
 		}
-		this->mSoundEngine->play2D("Sounds/coin.mp3");
+		this->mSoundEngine->play2D("Sounds/gem.wav");
+		break;
+	case GEM_EXTRA_SCORE:
+		this->mExtraScoreTime = 0.0f;
+		this->mExtraScore = true;
+		this->mScore += EXTRA_COINS_VALUE;
+		this->mSoundEngine->play2D("Sounds/gem.wav");
+		break;
+	case GEM_REVERSED_MODE:
+		this->mDirectionsReversedTime = 0.0f;
+		this->mDirectionsReversed = true;
+		this->mSoundEngine->play2D("Sounds/gem.wav");
 		break;
 	}
 }
@@ -451,8 +500,8 @@ void Game::GenerateSceneItems() {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
 				// Don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
-				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SPEED) {
-					int random = rand() % 20;
+				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_DOUBLE_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SPEED) {
+					int random = rand() % 1;
 
 					if (random == 0)
 						this->mGrid[y][x].push_back(mSceneBlocks[mBlockSliceIdx][y][x][mBlockId]);
@@ -498,10 +547,16 @@ void Game::ResetGame() {
 	this->mCoinValue = COIN_VALUE;
 	this->mDoubleScore = false;
 	this->mIncreaseSpeed = false;
+	this->mExtraScore = false;
+	this->mDirectionsReversed = false;
 
 	this->mCamera->SetPosition(CAMERA_POSITION_INIT);
 	this->mCamera->SetMoveSpeed(CAMERA_SPEED_INIT);
 	this->mCamera->StopAnimation();
+
+	this->mLight->SpecularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	this->mLight->DiffuseColor = this->mLight->SpecularColor * 0.9f;
+	this->mLight->AmbientColor = this->mLight->SpecularColor * 0.3f;
 
 	this->mBlockId = 0;
 	this->mGridIndexZ = 0;
@@ -591,9 +646,6 @@ void Game::InitCamera() {
 /* Initializes the game light sources */
 void Game::InitLightSources() {
 	this->mLight = new LightSource(0.0f, 0.0f, 0.0f);
-	this->mLight->AmbientColor *= 0.3f;
-	this->mLight->DiffuseColor *= 0.9f;
-	this->mLight->SpecularColor *= 1.0f;
 	this->mLight->AttenuationConstant = 0.5f;
 	this->mLight->AttenuationLinear = 0.1f;
 	this->mLight->AttenuationQuadratic = 0.032f;
@@ -610,4 +662,6 @@ void Game::InitTextRenderers() {
 	this->mMenuMsgWidth = this->mTextRenderer->GetTextWidth(MENU_MSG, MENU_FONT_SCALE);
 	this->mGemScoreLabelWidth = this->mTextRenderer->GetTextWidth(GEM_SCORE_LABEL + "100%", FONT_SCALE);
 	this->mGemSpeedLabelWidth = this->mTextRenderer->GetTextWidth(GEM_SPEED_LABEL + "100%", FONT_SCALE);
+	this->mReversedLabelWidth = this->mTextRenderer->GetTextWidth(GEM_REVERSED_MODE_LABEL + "100%", FONT_SCALE);
+	this->mExtraScoreLabelWidth = this->mTextRenderer->GetTextWidth(GEM_EXTRA_SCORE_LABEL, FONT_SCALE);
 }
