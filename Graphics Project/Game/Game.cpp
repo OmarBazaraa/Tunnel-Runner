@@ -451,6 +451,8 @@ void Game::ResetGame() {
 
 	for (int y = 0; y < LANES_Y_COUNT; ++y) {
 		for (int x = 0; x < LANES_X_COUNT; ++x) {
+			this->mCharacterGrid[y][x] = EMPTY;
+
 			while (!mGrid[y][x].empty()) {
 				this->mGrid[y][x].pop_front();
 			}
