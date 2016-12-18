@@ -134,7 +134,7 @@ public:
 	bool IsMovingRight() const;
 
 	/* Returns whether the camera is jumping */
-	bool IsJumping() const;
+	double IsJumping() const;
 
 	/* Returns the view matrix calculated using Eular Angles and the LookAt Matrix */
 	glm::mat4 GetViewMatrix() const;

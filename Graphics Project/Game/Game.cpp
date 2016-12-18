@@ -273,7 +273,7 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 
 	if (this->mCamera->IsMovingRight())
 		++x;
-	if (this->mCamera->IsJumping())
+	if (this->mCamera->IsJumping() && this->mCamera->IsJumping() < LANE_HEIGHT && y + 1 < LANES_Y_COUNT)
 		++y;
 
 	// Check if out of range
