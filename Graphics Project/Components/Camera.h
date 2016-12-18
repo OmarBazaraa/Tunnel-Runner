@@ -117,7 +117,7 @@ public:
 	glm::vec3 GetFront() const;
 
 	/* Returns the camera movement speed */
-	double Camera::GetCameraSpeed();
+	double GetCameraSpeed();
 
 	/* Sets the position of the ground/gravity, needed to apply falling effect */
 	void SetGravityPosition(double ypos);

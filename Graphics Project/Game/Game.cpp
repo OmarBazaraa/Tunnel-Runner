@@ -247,7 +247,7 @@ void Game::RenderText() {
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
 
 	// Gem score percentage
-	if (this->mDoubleScore) {
+	if (this->mGameState == RUNNING && this->mDoubleScore) {
 		ss.clear();
 		ss.str("");
 		ss << GEM_SCORE_LABEL << (int)(((DOUBLE_SCORE_DURATION - this->mDoubleScoreTime) / DOUBLE_SCORE_DURATION) * 100) << "%";
@@ -257,7 +257,7 @@ void Game::RenderText() {
 	}
 
 	// Gem speed percentage
-	if (this->mIncreaseSpeed) {
+	if (this->mGameState == RUNNING && this->mIncreaseSpeed) {
 		ss.clear();
 		ss.str("");
 		ss << GEM_SPEED_LABEL << (int)(((INCREASE_SPEED_DURATION - this->mIncreaseSpeedTime) / INCREASE_SPEED_DURATION) * 100) << "%";
@@ -272,7 +272,7 @@ void Game::RenderText() {
 	}
 
 	// Extra score gift
-	if (this->mExtraScore) {
+	if (this->mGameState == RUNNING && this->mExtraScore) {
 		x = (w - this->mExtraScoreLabelWidth) / 2;
 		y = h / 2;
 
@@ -280,7 +280,7 @@ void Game::RenderText() {
 	}
 
 	// Directions reversed percentage
-	if (this->mDirectionsReversed) {
+	if (this->mGameState == RUNNING && this->mDirectionsReversed) {
 		ss.clear();
 		ss.str("");
 		ss << GEM_REVERSED_MODE_LABEL << (int)(((DIRECTIONS_REVERSED_DURATION - this->mDirectionsReversedTime) / DIRECTIONS_REVERSED_DURATION) * 100) << "%";
