@@ -322,15 +322,17 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 		++y;
 
 	// Check if out of range
-	if (y < 0 || y >= LANES_Y_COUNT || x < 0 || x >= LANES_X_COUNT) {
+	if (y < 0 || y > LANES_Y_COUNT || x < 0 || x >= LANES_X_COUNT) {
 		return;
 	}
 
 	this->GetSlice(z);
 
 	// Set left and right borders
-	this->mBorderLeft = (x <= 0) ? BLOCK : mCharacterGrid[y][x - 1];
-	this->mBorderRight = (x + 1 >= LANES_X_COUNT) ? BLOCK : mCharacterGrid[y][x + 1];
+	if (y < LANES_Y_COUNT) {
+		this->mBorderLeft = (x <= 0) ? BLOCK : mCharacterGrid[y][x - 1];
+		this->mBorderRight = (x + 1 >= LANES_X_COUNT) ? BLOCK : mCharacterGrid[y][x + 1];
+	}
 
 	// Set gravity position
 	for (int i = y; i >= 0; --i) {
@@ -341,7 +343,7 @@ void Game::DetectCollision(glm::vec3 characterPos) {
 	}
 
 	// Detected collision
-	if (mCharacterGrid[y][x] != EMPTY) {
+	if (y < LANES_Y_COUNT && mCharacterGrid[y][x] != EMPTY) {
 		this->Collide(mCharacterGrid[y][x]);
 
 		if (mCharacterGrid[y][x] != BLOCK) {
@@ -452,7 +454,7 @@ void Game::GenerateSceneItems() {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
 				// Don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
 				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SPEED) {
-					int random = rand() % 20;
+					int random = rand() % 1;
 
 					if (random == 0)
 						this->mGrid[y][x].push_back(mSceneBlocks[mBlockSliceIdx][y][x][mBlockId]);

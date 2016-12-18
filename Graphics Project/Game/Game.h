@@ -77,7 +77,7 @@ const double GRAVITY_POS = LANE_HEIGHT;
 const double CHARACTER_OFFSET = LANE_DEPTH * 1.5;
 const double CAMERA_SPEED_INIT = 4;
 const double CAMERA_JUMP_OFFSET = LANE_HEIGHT;
-const double CAMERA_ACCELERATION = 0.1f;
+const double CAMERA_ACCELERATION = 5.0f;
 const glm::vec3 CAMERA_POSITION_INIT = glm::vec3(0.0f, GRAVITY_POS, 0.0f);
 
 // Font constants

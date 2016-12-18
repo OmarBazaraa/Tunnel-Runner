@@ -38,7 +38,7 @@ const double MAX_PITCH = 45.0f;
 const double MIN_PITCH = -MAX_PITCH;
 // Animation constants
 const double MOVE_SPEED_INIT = 4.0f;
-const double MOVE_SPEED_MAX = 8.0f;
+const double MOVE_SPEED_MAX = 15.0f;
 const double MOVE_ACCELERATION_INIT = 0.01;
 const double JUMP_SPEED = 4.0f;
 const double JUMP_ACCELERATION = 12.0f;			// If you want to jump with a certain height use this EQN => a = (MOVE_SPEED)^2 / (2 * Height)
