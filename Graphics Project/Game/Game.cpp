@@ -226,14 +226,9 @@ void Game::RenderText() {
 	ss.str("");
 	int m = (int)this->mGameTime / 60;
 	int s = (int)this->mGameTime % 60;
-
 	ss << TIME_LABEL;
-
-	if (m < 10) ss << 0;
-	ss << m << ".";
-	if (s < 10) ss << 0;
-	ss << s;
-
+	if (m < 10) ss << 0; ss << m << ".";
+	if (s < 10) ss << 0; ss << s;
 	x = w - FONT_MARGIN * 10;
 	y = h - FONT_MARGIN - FONT_SIZE;
 	this->mTextRenderer->RenderText(*this->mTextShader, ss.str(), x, y, FONT_SCALE, FONT_COLOR);
@@ -274,7 +269,7 @@ void Game::RenderText() {
 	// Extra score gift
 	if (this->mGameState == RUNNING && this->mExtraScore) {
 		x = (w - this->mExtraScoreLabelWidth) / 2;
-		y = h / 2;
+		y = h / 2 + FONT_MARGIN * FONT_MARGIN * this->mExtraScoreTime;
 
 		this->mTextRenderer->RenderText(*this->mTextShader, GEM_EXTRA_SCORE_LABEL, x, y, FONT_SCALE, FONT_COLOR);
 	}
@@ -323,17 +318,19 @@ void Game::ProcessKeyInput() {
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_ESCAPE) == GLFW_RELEASE)
 		this->mEscReleased = true;
 
-	// Quit
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_Q) == GLFW_PRESS)
-		glfwSetWindowShouldClose(this->mEngine->mWind, GL_TRUE);
-
-	// Replay
-	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_R) == GLFW_PRESS)
-		this->ResetGame();
-
 	// Return if game is not running
-	if (this->mGameState != RUNNING)
+	if (this->mGameState != RUNNING) {
+		// Quit
+		if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_Q) == GLFW_PRESS)
+			glfwSetWindowShouldClose(this->mEngine->mWind, GL_TRUE);
+
+		// Replay
+		if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_R) == GLFW_PRESS)
+			this->ResetGame();
+
 		return;
+	}
+		
 
 	// Game control
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_A) == GLFW_PRESS && (this->mDirectionsReversed ? mBorderRight : mBorderLeft) != BLOCK)
@@ -341,6 +338,7 @@ void Game::ProcessKeyInput() {
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_D) == GLFW_PRESS && (this->mDirectionsReversed ? mBorderLeft : mBorderRight) != BLOCK)
 		this->mCamera->MoveStep(this->mDirectionsReversed ? LEFT : RIGHT, LANE_WIDTH);
 
+	// Jump
 	if (glfwGetKey(this->mEngine->mWind, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		if (!this->mCamera->JumpingOffset()) {
 			this->mSoundEngine->play2D("Sounds/Jump.wav");
@@ -523,21 +521,22 @@ void Game::GenerateSceneItems() {
 		for (int y = 0; y < LANES_Y_COUNT; ++y) {
 			for (int x = 0; x < LANES_X_COUNT; ++x) {
 				// Don't always spawn the gem but some times spawn it and sometimes no (for more rarity)
-				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_DOUBLE_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_SPEED || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_EXTRA_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_REVERSED_MODE) {
+				if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] >= GEM_DOUBLE_SCORE && mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] <= GEM_REVERSED_MODE) {
 					int random = rand() % 10;
 
 					if (random == 0) {
 						if (mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_EXTRA_SCORE || mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] == GEM_REVERSED_MODE) {
-							int random2 = rand() % 2;
-							if (random2 == 0)
+							if (rand() % 2 == 0)
 								mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] = GEM_EXTRA_SCORE;
 							else
 								mSceneBlocks[mBlockSliceIdx][y][x][mBlockId] = GEM_REVERSED_MODE;
 						}
+
 						this->mGrid[y][x].push_back(mSceneBlocks[mBlockSliceIdx][y][x][mBlockId]);
 					}
-					else
+					else {
 						this->mGrid[y][x].push_back(COIN);
+					}
 				}
 				else {
 					this->mGrid[y][x].push_back(mSceneBlocks[mBlockSliceIdx][y][x][mBlockId]);
@@ -564,9 +563,6 @@ void Game::ClearGrid() {
 				this->mGrid[y][x].pop_front();
 			}
 		}
-
-		// moves the Z porition of the camera back to it's initial position
-		//this->mCamera->SetPosition(glm::vec3(cameraPosition.x, cameraPosition.y, CAMERA_POSITION.z));
 	}
 }
 
