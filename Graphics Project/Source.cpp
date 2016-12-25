@@ -3,7 +3,7 @@
 
 
 int main() {
-	GameEngine MyGameEngine(1280, 720, false);
+	GameEngine MyGameEngine(1920, 1080, true);
 	Game MyGame(&MyGameEngine, "Tunnel Runner");
 	MyGameEngine.Run();
 	return 0;
